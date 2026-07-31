@@ -83,6 +83,16 @@ class Order extends Model
     /* ----------------------------------------------------------------- */
 
     /**
+     * Rattache à l'utilisateur les commandes invité passées avec son email.
+     */
+    public static function claimFor(User $user): int
+    {
+        return static::whereNull('user_id')
+            ->where('customer_email', $user->email)
+            ->update(['user_id' => $user->id]);
+    }
+
+    /**
      * Génère un numéro de commande unique, ex. ES-20260731-A1B2C3.
      */
     public static function generateOrderNumber(): string
