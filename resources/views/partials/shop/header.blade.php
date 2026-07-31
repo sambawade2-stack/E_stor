@@ -1,4 +1,7 @@
-<header class="sticky top-0 z-40 bg-white shadow-sm" x-data="{ mobileOpen: false, catOpen: false }">
+<header class="sticky top-0 z-40 border-b border-gray-100/80 bg-white/85 backdrop-blur-xl transition-shadow duration-300"
+        x-data="{ mobileOpen: false, catOpen: false, scrolled: false }"
+        @scroll.window.passive="scrolled = window.scrollY > 8"
+        :class="scrolled && 'shadow-lg shadow-gray-900/5'">
 
     {{-- Barre supérieure --}}
     <div class="hidden bg-gray-900 text-xs text-gray-300 sm:block">
@@ -64,7 +67,7 @@
                    class="relative grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-primary-600">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
                     @if(($cartCount ?? 0) > 0)
-                        <span class="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">{{ $cartCount }}</span>
+                        <span class="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 animate-[float_3s_ease-in-out_infinite] place-items-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 px-1 text-[10px] font-bold text-white shadow-md shadow-primary-600/40">{{ $cartCount }}</span>
                     @endif
                 </a>
             @endif

@@ -45,14 +45,24 @@
 
     {{-- Messages flash globaux --}}
     @if (session('success'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
-             class="fixed inset-x-0 top-4 z-50 mx-auto w-fit max-w-[90vw] rounded-lg bg-emerald-600 px-5 py-3 text-sm font-medium text-white shadow-lg">
+        <div x-data="{ show: false }" x-show="show" x-cloak x-init="requestAnimationFrame(() => show = true); setTimeout(() => show = false, 5000)"
+             x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="-translate-y-6 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition duration-200 ease-in" x-transition:leave-end="-translate-y-6 opacity-0"
+             class="fixed inset-x-0 top-4 z-50 mx-auto flex w-fit max-w-[90vw] items-center gap-2.5 rounded-full bg-gray-950/90 py-3 pl-4 pr-6 text-sm font-medium text-white shadow-2xl shadow-gray-950/30 backdrop-blur">
+            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-500">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+            </span>
             {{ session('success') }}
         </div>
     @endif
     @if (session('error'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 6000)"
-             class="fixed inset-x-0 top-4 z-50 mx-auto w-fit max-w-[90vw] rounded-lg bg-red-600 px-5 py-3 text-sm font-medium text-white shadow-lg">
+        <div x-data="{ show: false }" x-show="show" x-cloak x-init="requestAnimationFrame(() => show = true); setTimeout(() => show = false, 6000)"
+             x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="-translate-y-6 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition duration-200 ease-in" x-transition:leave-end="-translate-y-6 opacity-0"
+             class="fixed inset-x-0 top-4 z-50 mx-auto flex w-fit max-w-[90vw] items-center gap-2.5 rounded-full bg-gray-950/90 py-3 pl-4 pr-6 text-sm font-medium text-white shadow-2xl shadow-gray-950/30 backdrop-blur">
+            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-red-500">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </span>
             {{ session('error') }}
         </div>
     @endif

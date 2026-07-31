@@ -58,6 +58,7 @@
                     @foreach ($gallery as $index => $image)
                         <img x-show="active === {{ $index }}" src="{{ $image['url'] }}" alt="{{ $image['alt'] }}"
                              loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                             x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100"
                              class="h-full w-full object-cover transition duration-500"
                              :class="zoom ? 'scale-125' : 'scale-100'">
                     @endforeach
@@ -148,11 +149,11 @@
                                 @csrf
                                 <input type="hidden" name="quantity" :value="qty">
                                 <button type="submit"
-                                        class="flex-1 rounded-full bg-primary-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition hover:bg-primary-700">
+                                        class="btn-shine flex-1 rounded-full bg-gradient-to-r from-primary-600 to-sky-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/40 active:translate-y-0">
                                     Ajouter au panier
                                 </button>
                                 <button type="submit" name="buy_now" value="1"
-                                        class="flex-1 rounded-full bg-gray-950 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800">
+                                        class="btn-shine flex-1 rounded-full bg-gray-950 py-3.5 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-950/30 active:translate-y-0">
                                     Acheter maintenant
                                 </button>
                             </form>
