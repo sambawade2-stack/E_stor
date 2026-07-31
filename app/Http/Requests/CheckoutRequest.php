@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PaymentProvider;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class CheckoutRequest extends FormRequest
 {
@@ -23,6 +25,7 @@ class CheckoutRequest extends FormRequest
             'address' => ['required', 'string', 'max:255'],
             'shipping_zone_id' => ['required', 'integer', 'exists:shipping_zones,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'payment' => ['required', new Enum(PaymentProvider::class)],
         ];
     }
 

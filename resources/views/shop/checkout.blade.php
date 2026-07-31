@@ -89,14 +89,23 @@
 
                 <section class="rounded-2xl border border-gray-100 p-6">
                     <h2 class="mb-5 text-lg font-bold">Paiement</h2>
-                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-primary-600 bg-primary-50/50 p-4">
-                        <input type="radio" name="payment" value="cash_on_delivery" checked class="text-primary-600 focus:ring-primary-500">
-                        <span>
-                            <span class="block text-sm font-semibold">Paiement à la livraison</span>
-                            <span class="block text-xs text-gray-500">Payez en espèces ou par Wave / Orange Money à la réception</span>
-                        </span>
-                    </label>
-                    <p class="mt-3 text-xs text-gray-400">Le paiement en ligne (Wave, Orange Money, carte bancaire) arrive très bientôt.</p>
+                    <div class="space-y-3" x-data="{ payment: '{{ old('payment', 'cash_on_delivery') }}' }">
+                        @foreach ($paymentMethods as $method)
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition"
+                                   :class="payment === '{{ $method->provider()->value }}' ? 'border-primary-600 bg-primary-50/50' : 'border-gray-100 hover:border-gray-200'">
+                                <input type="radio" name="payment" value="{{ $method->provider()->value }}" x-model="payment"
+                                       class="text-primary-600 focus:ring-primary-500">
+                                <span>
+                                    <span class="block text-sm font-semibold">{{ $method->label() }}</span>
+                                    <span class="block text-xs text-gray-500">{{ $method->description() }}</span>
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('payment')<p class="mt-2 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @if ($paymentMethods->count() === 1)
+                        <p class="mt-3 text-xs text-gray-400">Le paiement en ligne (Wave, Orange Money, carte bancaire) arrive très bientôt.</p>
+                    @endif
                 </section>
             </div>
 

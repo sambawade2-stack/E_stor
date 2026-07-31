@@ -99,6 +99,7 @@ class CartCheckoutTest extends TestCase
             'customer_email' => 'awa@example.com',
             'address' => 'Sacré-Cœur 3, villa 123',
             'shipping_zone_id' => $this->zone->id,
+            'payment' => 'cash_on_delivery',
         ]);
 
         $order = Order::firstOrFail();
@@ -136,6 +137,7 @@ class CartCheckoutTest extends TestCase
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
             'shipping_zone_id' => $this->zone->id,
+            'payment' => 'cash_on_delivery',
         ]);
 
         $order = Order::firstOrFail();
@@ -149,6 +151,6 @@ class CartCheckoutTest extends TestCase
         $this->post(route('shop.cart.add', $this->product));
 
         $this->post(route('shop.checkout.store'), [])
-            ->assertSessionHasErrors(['customer_name', 'customer_phone', 'address', 'shipping_zone_id']);
+            ->assertSessionHasErrors(['customer_name', 'customer_phone', 'address', 'shipping_zone_id', 'payment']);
     }
 }
