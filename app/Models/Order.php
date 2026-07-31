@@ -9,10 +9,23 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Order extends Model
 {
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'payment_status', 'payment_provider', 'total'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
     protected $fillable = [
         'order_number',
         'user_id',
@@ -102,6 +115,54 @@ class Order extends Model
         } while (static::where('order_number', $number)->exists());
 
         return $number;
+    }
+
+    /**
+     * Applique un changement de statut avec ses effets de bord :
+     * horodatages, statut de paiement, remise en stock si annulation.
+     *
+     * @throws \InvalidArgumentException si la transition n'est pas autorisée
+     */
+    public function transitionTo(OrderStatus $status): void
+    {
+        if ($status === $this->status) {
+            return;
+        }
+
+        if (! in_array($status, $this->status->allowedTransitions(), true)) {
+            throw new \InvalidArgumentException(
+                "Transition impossible de « {$this->status->label()} » vers « {$status->label()} »."
+            );
+        }
+
+        DB::transaction(function () use ($status) {
+            $changes = ['status' => $status];
+
+            match ($status) {
+                OrderStatus::Paid => $changes += [
+                    'payment_status' => PaymentStatus::Paid,
+                    'paid_at' => now(),
+                ],
+                OrderStatus::Shipped => $changes += ['shipped_at' => now()],
+                OrderStatus::Delivered => $changes += [
+                    'delivered_at' => now(),
+                    // Paiement à la livraison : la livraison vaut encaissement
+                    ...($this->payment_provider === PaymentProvider::CashOnDelivery
+                        ? ['payment_status' => PaymentStatus::Paid, 'paid_at' => $this->paid_at ?? now()]
+                        : []),
+                ],
+                OrderStatus::Cancelled => $changes += ['cancelled_at' => now()],
+                default => null,
+            };
+
+            // Une commande annulée remet ses articles en stock
+            if ($status === OrderStatus::Cancelled) {
+                $this->items()->with('product')->get()
+                    ->each(fn (OrderItem $item) => $item->product?->increment('stock_quantity', $item->quantity));
+            }
+
+            $this->update($changes);
+        });
     }
 
     public function markAsPaid(): void

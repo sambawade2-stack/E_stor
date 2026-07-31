@@ -10,6 +10,9 @@
             <div class="flex items-center gap-4">
                 <a href="tel:{{ preg_replace('/\s+/', '', setting('shop_phone')) }}" class="hover:text-white">{{ setting('shop_phone') }}</a>
                 @auth
+                    @if (auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="font-semibold text-primary-400 hover:text-primary-300">Administration</a>
+                    @endif
                     <a href="{{ route('dashboard') }}" class="hover:text-white">Mon compte</a>
                 @else
                     <a href="{{ route('login') }}" class="hover:text-white">Connexion</a>
