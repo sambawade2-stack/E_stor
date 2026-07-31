@@ -21,7 +21,7 @@
     <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full bg-gray-950 text-gray-300 transition-transform lg:translate-x-0"
            :class="sidebarOpen && 'translate-x-0'">
         <div class="flex h-16 items-center gap-2.5 border-b border-white/10 px-5">
-            <span class="grid h-9 w-9 place-items-center rounded-lg bg-white/10 text-base font-extrabold text-white">É<span class="text-primary-500">S</span></span>
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/10 text-base font-extrabold leading-none text-white"><span class="whitespace-nowrap">E<span class="text-primary-500">S</span></span></span>
             <div class="leading-tight">
                 <p class="text-sm font-bold text-white">{{ setting('shop_name') }}</p>
                 <p class="text-[10px] uppercase tracking-widest text-gray-500">Administration</p>

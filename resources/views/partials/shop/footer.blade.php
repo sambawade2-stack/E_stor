@@ -7,7 +7,7 @@
             {{-- Marque --}}
             <div>
                 <a href="{{ route('shop.home') }}" class="flex items-center gap-2.5">
-                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-lg font-extrabold text-white">É<span class="text-primary-500">S</span></span>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/10 text-lg font-extrabold leading-none text-white"><span class="whitespace-nowrap">E<span class="text-primary-500">S</span></span></span>
                     <span class="text-base font-extrabold tracking-tight text-white">Électroniques <span class="text-primary-500">Stores</span></span>
                 </a>
                 <p class="mt-4 text-sm leading-relaxed">

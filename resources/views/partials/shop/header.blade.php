@@ -33,8 +33,8 @@
             @if(setting('logo_path'))
                 <img src="{{ Storage::url(setting('logo_path')) }}" alt="{{ setting('shop_name') }}" class="h-10 w-auto">
             @else
-                <span class="grid h-10 w-10 place-items-center rounded-xl bg-gray-900 text-lg font-extrabold text-white">
-                    <span>É<span class="text-primary-500">S</span></span>
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-gray-900 text-lg font-extrabold leading-none text-white">
+                    <span class="whitespace-nowrap">E<span class="text-primary-500">S</span></span>
                 </span>
                 <span class="hidden flex-col leading-tight md:flex">
                     <span class="text-base font-extrabold tracking-tight text-gray-900">Électroniques <span class="text-primary-600">Stores</span></span>
