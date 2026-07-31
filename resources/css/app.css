@@ -37,8 +37,20 @@
         @apply bg-primary-600 text-white;
     }
 
+    /* Taille de base relevée (16 → 17px) : toutes les tailles Tailwind
+       (rem) sont agrandies proportionnellement sur l'ensemble du site */
     html {
+        font-size: 106.25%;
         scrollbar-color: theme('colors.gray.300') transparent;
+    }
+
+    body {
+        font-optical-sizing: auto;
+        letter-spacing: -0.011em;
+    }
+
+    h1, h2, h3 {
+        letter-spacing: -0.025em;
     }
 
     body::-webkit-scrollbar {
