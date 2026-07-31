@@ -146,11 +146,24 @@ class CatalogSeeder extends Seeder
             ],
         ];
 
+        $reviews = [
+            'ES-JBL-510BT' => [
+                ['author_name' => 'Moussa Diop', 'rating' => 5, 'comment' => 'Très bon casque, le son est excellent et la batterie tient vraiment longtemps. Livré en 24h à Dakar !'],
+                ['author_name' => 'Awa Ndiaye', 'rating' => 4, 'comment' => 'Bonne qualité sonore, confortable même après plusieurs heures. Je recommande.'],
+            ],
+            'ES-ANK-PC20K' => [
+                ['author_name' => 'Ibrahima Fall', 'rating' => 5, 'comment' => 'Power bank au top, je charge mon téléphone 4 fois avant de la recharger. Produit authentique.'],
+            ],
+            'ES-TPL-RE305' => [
+                ['author_name' => 'Fatou Sarr', 'rating' => 5, 'comment' => 'Installation très simple, le WiFi passe maintenant dans toute la maison. Service client réactif sur WhatsApp.'],
+            ],
+        ];
+
         foreach ($products as $data) {
             $category = Category::where('name', $data['category'])->first();
             $brand = Brand::where('name', $data['brand'])->first();
 
-            Product::firstOrCreate(
+            $product = Product::firstOrCreate(
                 ['sku' => $data['sku']],
                 [
                     'category_id' => $category->id,
@@ -166,6 +179,13 @@ class CatalogSeeder extends Seeder
                     'is_active' => true,
                 ]
             );
+
+            foreach ($reviews[$data['sku']] ?? [] as $review) {
+                $product->reviews()->firstOrCreate(
+                    ['author_name' => $review['author_name']],
+                    [...$review, 'is_approved' => true]
+                );
+            }
         }
     }
 }

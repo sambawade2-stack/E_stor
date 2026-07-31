@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <rect width="400" height="400" fill="#F3F4F6"/>
+  <g transform="translate(140 140)" stroke="#D1D5DB" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="20" y="0" width="80" height="120" rx="12" fill="#E5E7EB"/>
+    <line x1="45" y1="100" x2="75" y2="100"/>
+  </g>
+  <text x="200" y="310" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#9CA3AF">Image à venir</text>
+</svg>
