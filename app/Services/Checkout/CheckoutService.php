@@ -5,6 +5,7 @@ namespace App\Services\Checkout;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentProvider;
 use App\Enums\PaymentStatus;
+use App\Events\OrderPlaced;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -104,6 +105,8 @@ class CheckoutService
         });
 
         $this->cart->clear();
+
+        OrderPlaced::dispatch($order->load('items'));
 
         return $order;
     }

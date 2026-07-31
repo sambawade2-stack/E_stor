@@ -135,6 +135,8 @@ class Order extends Model
             );
         }
 
+        $previous = $this->status;
+
         DB::transaction(function () use ($status) {
             $changes = ['status' => $status];
 
@@ -163,6 +165,8 @@ class Order extends Model
 
             $this->update($changes);
         });
+
+        \App\Events\OrderStatusChanged::dispatch($this, $previous);
     }
 
     public function markAsPaid(): void
