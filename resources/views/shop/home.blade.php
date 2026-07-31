@@ -1,5 +1,19 @@
 <x-shop-layout>
 
+    <x-slot:head>
+        <script type="application/ld+json">{!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'OnlineStore',
+            'name' => setting('shop_name'),
+            'description' => setting('shop_tagline'),
+            'url' => route('shop.home'),
+            'telephone' => setting('shop_phone'),
+            'email' => setting('shop_email'),
+            'address' => ['@type' => 'PostalAddress', 'streetAddress' => setting('shop_address')],
+            'sameAs' => array_values(array_filter([setting('facebook_url'), setting('instagram_url'), setting('tiktok_url')])),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    </x-slot:head>
+
     {{-- ============================= HERO ============================= --}}
     <section class="relative overflow-hidden bg-gray-950 text-white">
         <div class="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary-600/30 blur-3xl"></div>

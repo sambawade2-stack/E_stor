@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Shop\CartController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Shop\CatalogController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\HomeController;
@@ -29,6 +30,8 @@ use Illuminate\Support\Facades\Route;
 | Boutique (public)
 |--------------------------------------------------------------------------
 */
+
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::name('shop.')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');

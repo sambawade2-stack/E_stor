@@ -1,7 +1,34 @@
 <x-shop-layout
     :title="$product->meta_title ?: $product->name"
     :metaDescription="$product->meta_description ?: $product->short_description"
-    :whatsappMessage="'Je souhaite commander ce produit : '.$product->name">
+    :whatsappMessage="'Je souhaite commander ce produit : '.$product->name"
+    :ogImage="$product->primaryImage?->url()"
+    ogType="product">
+
+    <x-slot:head>
+        <script type="application/ld+json">{!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'description' => $product->short_description ?: strip_tags((string) $product->description),
+            'image' => $product->images->map(fn ($img) => $img->url())->all() ?: [asset('images/placeholder-product.svg')],
+            'brand' => $product->brand ? ['@type' => 'Brand', 'name' => $product->brand->name] : null,
+            'category' => $product->category->name,
+            'offers' => [
+                '@type' => 'Offer',
+                'url' => route('shop.product', $product),
+                'price' => $product->current_price,
+                'priceCurrency' => config('shop.currency'),
+                'availability' => $product->inStock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            ],
+            'aggregateRating' => $product->reviews_count > 0 ? [
+                '@type' => 'AggregateRating',
+                'ratingValue' => round((float) $product->rating, 1),
+                'reviewCount' => $product->reviews_count,
+            ] : null,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    </x-slot:head>
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 

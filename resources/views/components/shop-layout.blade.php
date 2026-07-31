@@ -1,4 +1,4 @@
-@props(['title' => null, 'metaDescription' => null, 'whatsappMessage' => null])
+@props(['title' => null, 'metaDescription' => null, 'whatsappMessage' => null, 'ogImage' => null, 'ogType' => 'website'])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -7,8 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ isset($title) ? $title.' — '.setting('shop_name') : setting('shop_name').' — '.setting('shop_tagline') }}</title>
-    <meta name="description" content="{{ $metaDescription ?? setting('shop_name').' : accessoires électroniques, écouteurs Bluetooth, chargeurs, power banks et répéteurs WiFi. '.setting('shop_tagline') }}">
+    @php
+        $pageTitle = $title ? $title.' — '.setting('shop_name') : setting('shop_name').' — '.setting('shop_tagline');
+        $pageDescription = $metaDescription ?? setting('shop_name').' : accessoires électroniques, écouteurs Bluetooth, chargeurs, power banks et répéteurs WiFi. '.setting('shop_tagline');
+    @endphp
+
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
+    <link rel="canonical" href="{{ request()->url() }}">
+
+    {{-- OpenGraph / Twitter --}}
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:site_name" content="{{ setting('shop_name') }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ request()->url() }}">
+    <meta property="og:image" content="{{ $ogImage ?? asset('images/placeholder-product.svg') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    <meta name="twitter:image" content="{{ $ogImage ?? asset('images/placeholder-product.svg') }}">
 
     @if(setting('favicon_path'))
         <link rel="icon" href="{{ Storage::url(setting('favicon_path')) }}">
