@@ -32,6 +32,12 @@
             {{ session('success') }}
         </div>
     @endif
+    @if (session('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 6000)"
+             class="fixed inset-x-0 top-4 z-50 mx-auto w-fit max-w-[90vw] rounded-lg bg-red-600 px-5 py-3 text-sm font-medium text-white shadow-lg">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <main>
         {{ $slot }}
