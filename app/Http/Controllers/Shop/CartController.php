@@ -49,6 +49,11 @@ class CartController extends Controller
             return redirect()->route('shop.checkout');
         }
 
+        // Ajout rapide depuis une carte produit : on ne coupe pas la navigation
+        if ($request->boolean('quick')) {
+            return back()->with('success', 'Produit ajouté au panier 🛒');
+        }
+
         return redirect()->route('shop.cart')
             ->with('success', 'Produit ajouté au panier.');
     }

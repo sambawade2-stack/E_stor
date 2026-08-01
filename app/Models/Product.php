@@ -172,6 +172,14 @@ class Product extends Model
         return $this->stock_quantity > 0;
     }
 
+    /**
+     * Produit récent : badge « Nouveau » sur les cartes.
+     */
+    public function isNew(): bool
+    {
+        return $this->created_at !== null && $this->created_at->gt(now()->subDays(14));
+    }
+
     public function isLowStock(): bool
     {
         return $this->stock_quantity > 0 && $this->stock_quantity <= $this->low_stock_threshold;

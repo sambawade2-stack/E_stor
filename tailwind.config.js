@@ -14,10 +14,19 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+                display: ['Sora', 'Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },
+            /*
+             * Design tokens — palette sémantique.
+             * Niveaux 600+ : contraste AA garanti sur fond blanc.
+             */
             colors: {
-                // Couleur de marque : bleu #2563EB (= blue-600)
-                primary: colors.blue,
+                primary: colors.blue, // Marque : #2563EB (= primary-600)
+                accent: colors.sky, // Dégradés et accents secondaires
+                success: colors.emerald,
+                warning: colors.amber,
+                danger: colors.red,
+                info: colors.cyan,
             },
         },
     },

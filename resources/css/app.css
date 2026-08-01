@@ -49,8 +49,17 @@
         letter-spacing: -0.011em;
     }
 
+    /* Duo typographique : Sora pour les titres, Jakarta pour le corps */
     h1, h2, h3 {
-        letter-spacing: -0.025em;
+        @apply font-display;
+        letter-spacing: -0.03em;
+    }
+
+    /* Focus clavier visible partout (WCAG 2.4.7) sans polluer le clic souris */
+    a:focus-visible,
+    button:focus-visible,
+    [role='button']:focus-visible {
+        @apply outline-none ring-2 ring-primary-500 ring-offset-2;
     }
 
     body::-webkit-scrollbar {
@@ -129,6 +138,18 @@
 
 .group\/marquee:hover .animate-marquee {
     animation-play-state: paused;
+}
+
+/* Placeholder shimmer pendant le chargement des images */
+@keyframes skeleton {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+.img-skeleton {
+    background: linear-gradient(100deg, theme('colors.gray.100') 40%, theme('colors.gray.50') 50%, theme('colors.gray.100') 60%);
+    background-size: 200% 100%;
+    animation: skeleton 1.6s ease-in-out infinite;
 }
 
 @keyframes shine {

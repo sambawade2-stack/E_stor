@@ -57,9 +57,10 @@ class AppServiceProvider extends ServiceProvider
             ));
         });
 
-        // Compteur d'articles du panier, affiché dans le header
+        // Compteurs panier et favoris, affichés dans le header
         View::composer('partials.shop.header', function ($view) {
             $view->with('cartCount', app(CartService::class)->count());
+            $view->with('wishlistCount', app(\App\Services\Wishlist\WishlistService::class)->count());
         });
     }
 }

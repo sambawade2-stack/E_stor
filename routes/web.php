@@ -22,6 +22,7 @@ use App\Http\Controllers\Shop\NewsletterController;
 use App\Http\Controllers\Shop\PageController;
 use App\Http\Controllers\Shop\PaymentController;
 use App\Http\Controllers\Shop\ProductController;
+use App\Http\Controllers\Shop\WishlistController;
 use App\Http\Controllers\Webhooks\PayDunyaWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,9 @@ Route::name('shop.')->group(function () {
     Route::get('/categorie/{category:slug}', [CatalogController::class, 'category'])->name('category');
     Route::get('/promotions', [CatalogController::class, 'promotions'])->name('promotions');
     Route::get('/produit/{product:slug}', [ProductController::class, 'show'])->name('product');
+
+    Route::get('/favoris', [WishlistController::class, 'index'])->name('wishlist');
+    Route::post('/favoris/{product:slug}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     Route::get('/panier', [CartController::class, 'index'])->name('cart');
     Route::post('/panier/ajouter/{product:slug}', [CartController::class, 'add'])->name('cart.add');

@@ -62,6 +62,14 @@
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
             </a>
 
+            <a href="{{ route('shop.wishlist') }}" aria-label="Mes favoris"
+               class="relative grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-danger-500">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+                @if(($wishlistCount ?? 0) > 0)
+                    <span class="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-gradient-to-br from-danger-400 to-danger-600 px-1 text-[10px] font-bold text-white shadow-md shadow-danger-500/40">{{ $wishlistCount }}</span>
+                @endif
+            </a>
+
             @if (Route::has('shop.cart'))
                 <a href="{{ route('shop.cart') }}" aria-label="Panier"
                    class="relative grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-primary-600">
@@ -121,6 +129,7 @@
             <a href="{{ route('shop.home') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Accueil</a>
             <a href="{{ route('shop.catalog') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Catalogue</a>
             <a href="{{ route('shop.promotions') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">🔥 Promotions</a>
+            <a href="{{ route('shop.wishlist') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">❤ Mes favoris</a>
 
             <p class="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Catégories</p>
             @foreach ($navCategories as $cat)
