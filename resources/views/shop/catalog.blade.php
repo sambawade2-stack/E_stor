@@ -120,9 +120,7 @@
                         <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
                         <p class="mt-4 font-semibold text-gray-900">Aucun produit trouvé</p>
                         <p class="mt-1 text-sm text-gray-500">Essayez de modifier vos filtres ou votre recherche.</p>
-                        <a href="{{ route('shop.catalog') }}" class="mt-5 inline-block rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
-                            Voir tout le catalogue
-                        </a>
+                        <x-btn href="{{ route('shop.catalog') }}" class="mt-6">Voir tout le catalogue</x-btn>
                     </div>
                 @else
                     <div class="grid grid-cols-2 gap-4 sm:gap-6 xl:grid-cols-3">

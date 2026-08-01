@@ -49,7 +49,7 @@
                     ? $product->images->map(fn ($img) => ['url' => $img->url(), 'alt' => $img->alt ?? $product->name])->values()
                     : collect([['url' => asset('images/placeholder-product.svg'), 'alt' => $product->name]]);
             @endphp
-            <div x-data="{ active: 0, zoom: false }" class="space-y-3">
+            <div x-data="{ active: 0, zoom: false }" class="space-y-3 self-start lg:sticky lg:top-24">
                 <div class="relative aspect-square overflow-hidden rounded-3xl border border-gray-100 bg-gray-50"
                      @mouseenter="zoom = true" @mouseleave="zoom = false">
                     @if ($product->discount_percentage)

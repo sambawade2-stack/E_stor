@@ -13,9 +13,7 @@
                 <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/></svg>
                 <p class="mt-4 font-semibold text-gray-900">Votre panier est vide</p>
                 <p class="mt-1 text-sm text-gray-500">Parcourez notre catalogue pour trouver votre bonheur.</p>
-                <a href="{{ route('shop.catalog') }}" class="mt-5 inline-block rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
-                    Voir le catalogue
-                </a>
+                <x-btn href="{{ route('shop.catalog') }}" class="mt-6">Voir le catalogue</x-btn>
             </div>
         @else
             <div class="grid gap-8 lg:grid-cols-[1fr_22rem]">
@@ -137,10 +135,9 @@
                         </div>
                     </dl>
 
-                    <a href="{{ route('shop.checkout') }}"
-                       class="block rounded-full bg-primary-600 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition hover:bg-primary-700">
+                    <x-btn href="{{ route('shop.checkout') }}" size="lg" class="btn-shine w-full">
                         Passer la commande
-                    </a>
+                    </x-btn>
                     <p class="text-center text-xs text-gray-400">Paiement sécurisé · Livraison rapide</p>
                 </aside>
             </div>

@@ -74,5 +74,16 @@
     @include('partials.shop.footer')
     @include('partials.shop.whatsapp-button')
 
+    {{-- Retour en haut --}}
+    <button x-data="{ show: false }" x-show="show" x-cloak
+            @scroll.window.passive="show = window.scrollY > 600"
+            @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+            x-transition:enter="transition duration-300" x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition duration-200" x-transition:leave-end="opacity-0 translate-y-3"
+            aria-label="Retour en haut de page"
+            class="fixed bottom-5 left-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-gray-200 bg-white/90 text-gray-600 shadow-lg backdrop-blur transition hover:-translate-y-1 hover:text-primary-600 hover:shadow-xl sm:bottom-6 sm:left-6">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/></svg>
+    </button>
+
 </body>
 </html>
