@@ -27,7 +27,7 @@ class CategoryRequest extends FormRequest
             ],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['boolean'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:8192'],
         ];
     }
 }

@@ -20,7 +20,7 @@ class BrandRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('brands')->ignore($this->route('brand'))],
             'is_active' => ['boolean'],
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:4096'],
         ];
     }
 }

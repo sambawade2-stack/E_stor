@@ -24,10 +24,15 @@ php artisan key:generate
 php artisan migrate --seed     # SQLite par défaut ; crée l'admin + données de démo
 php artisan storage:link
 npm run build                  # ou npm run dev
-php artisan serve
+composer run serve             # démarre avec des limites d'upload relevées (10 Mo/image)
 ```
 
 Admin : `admin@electroniques-stores.com` / mot de passe défini par `ADMIN_DEFAULT_PASSWORD` (`.env`).
+
+> ⚠️ N'utilisez pas `php artisan serve` seul pour uploader des images (photos produits, logos…) :
+> la limite `upload_max_filesize` par défaut de PHP (souvent 2 Mo) est ignorée par Laravel et
+> bloque silencieusement l'upload. `composer run serve` relève cette limite pour le serveur de
+> développement. En production (Apache/Nginx + PHP-FPM), `public/.user.ini` s'applique automatiquement.
 
 ### Passer sur MySQL
 

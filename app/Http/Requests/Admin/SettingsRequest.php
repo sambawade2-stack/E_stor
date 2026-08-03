@@ -27,7 +27,7 @@ class SettingsRequest extends FormRequest
             'facebook_url' => ['nullable', 'url', 'max:255'],
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'tiktok_url' => ['nullable', 'url', 'max:255'],
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:4096'],
             'favicon' => ['nullable', 'image', 'mimes:png,ico,webp', 'max:512'],
         ];
     }

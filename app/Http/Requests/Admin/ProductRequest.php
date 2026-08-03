@@ -36,8 +36,16 @@ class ProductRequest extends FormRequest
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
             'images' => ['nullable', 'array', 'max:8'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return ['images.*' => 'image'];
     }
 
     /**
