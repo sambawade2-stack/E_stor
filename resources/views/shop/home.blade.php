@@ -263,10 +263,7 @@
                     @csrf
                     <input type="email" name="email" required placeholder="Votre adresse email"
                            class="w-full rounded-full border-0 px-5 py-3 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white">
-                    <button type="submit"
-                            class="btn-shine shrink-0 rounded-full bg-gray-950 px-7 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-950/40 active:translate-y-0">
-                        S'inscrire
-                    </button>
+                    <x-btn type="submit" variant="secondary" class="btn-shine shrink-0">S'inscrire</x-btn>
                 </form>
                 @error('email')
                     <p class="mt-2 text-sm text-primary-100">{{ $message }}</p>

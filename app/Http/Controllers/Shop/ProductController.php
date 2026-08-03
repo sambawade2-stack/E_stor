@@ -36,4 +36,19 @@ class ProductController extends Controller
 
         return view('shop.product', compact('product', 'similar'));
     }
+
+    /**
+     * Fragment HTML pour la modale « Aperçu rapide » ouverte depuis une
+     * carte produit (fetch Alpine.js) — pas de layout, juste le contenu.
+     */
+    public function quickView(Product $product): View
+    {
+        abort_unless($product->is_active, 404);
+
+        $product->load(['images', 'category:id,name,slug']);
+        $product->loadAvg('approvedReviews as rating', 'rating');
+        $product->loadCount('approvedReviews as reviews_count');
+
+        return view('shop.partials.quick-view', compact('product'));
+    }
 }

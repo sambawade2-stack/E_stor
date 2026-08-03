@@ -35,6 +35,18 @@
              alt="{{ $product->primaryImage?->alt ?? $product->name }}"
              loading="lazy"
              class="relative h-full w-full bg-gray-50 object-cover transition duration-700 ease-out group-hover:scale-110">
+
+        {{-- Aperçu rapide (desktop uniquement — la carte entière reste cliquable sur mobile) --}}
+        <button type="button"
+                @click.prevent.stop="window.dispatchEvent(new CustomEvent('open-quick-view', { detail: { url: '{{ route('shop.product.quick-view', $product) }}' } }))"
+                aria-label="Aperçu rapide de {{ $product->name }}"
+                class="absolute inset-x-3 bottom-3 z-10 hidden translate-y-2 items-center justify-center gap-1.5 rounded-full bg-white/95 py-2.5 text-xs font-semibold text-gray-700 opacity-0 shadow-lg backdrop-blur transition duration-300 hover:bg-white group-hover:translate-y-0 group-hover:opacity-100 sm:flex">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+            </svg>
+            Aperçu rapide
+        </button>
     </a>
 
     {{-- Contenu --}}

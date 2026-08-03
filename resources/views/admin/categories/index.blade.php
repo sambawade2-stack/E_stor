@@ -51,11 +51,9 @@
                             <td class="px-6 py-3 text-right">
                                 <div class="inline-flex items-center gap-1">
                                     <a href="{{ route('admin.categories.edit', $category) }}" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-primary-600 transition hover:bg-primary-50">Modifier</a>
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
-                                          onsubmit="return confirm('Supprimer cette catégorie ?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50">Supprimer</button>
-                                    </form>
+                                    <x-confirm-form :action="route('admin.categories.destroy', $category)" message="Supprimer la catégorie « {{ $category->name }} » ? Cette action est irréversible.">
+                                        <button type="submit" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-danger-500 transition hover:bg-danger-50">Supprimer</button>
+                                    </x-confirm-form>
                                 </div>
                             </td>
                         </tr>

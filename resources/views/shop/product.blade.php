@@ -32,14 +32,11 @@
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {{-- Fil d'Ariane --}}
-        <nav class="mb-6 text-xs text-gray-400" aria-label="Fil d'Ariane">
-            <a href="{{ route('shop.home') }}" class="hover:text-primary-600">Accueil</a>
-            <span class="mx-1.5">/</span>
-            <a href="{{ route('shop.category', $product->category) }}" class="hover:text-primary-600">{{ $product->category->name }}</a>
-            <span class="mx-1.5">/</span>
-            <span class="text-gray-600">{{ $product->name }}</span>
-        </nav>
+        <x-breadcrumb :items="[
+            ['label' => 'Accueil', 'url' => route('shop.home')],
+            ['label' => $product->category->name, 'url' => route('shop.category', $product->category)],
+            ['label' => $product->name],
+        ]" class="mb-6" />
 
         <div class="grid gap-10 lg:grid-cols-2">
 
@@ -148,14 +145,8 @@
                             <form action="{{ route('shop.cart.add', $product) }}" method="POST" class="flex flex-col gap-3 sm:flex-row">
                                 @csrf
                                 <input type="hidden" name="quantity" :value="qty">
-                                <button type="submit"
-                                        class="btn-shine flex-1 rounded-full bg-gradient-to-r from-primary-600 to-sky-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-500/40 active:translate-y-0">
-                                    Ajouter au panier
-                                </button>
-                                <button type="submit" name="buy_now" value="1"
-                                        class="btn-shine flex-1 rounded-full bg-gray-950 py-3.5 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-950/30 active:translate-y-0">
-                                    Acheter maintenant
-                                </button>
+                                <x-btn type="submit" class="btn-shine flex-1">Ajouter au panier</x-btn>
+                                <x-btn type="submit" name="buy_now" value="1" variant="secondary" class="btn-shine flex-1">Acheter maintenant</x-btn>
                             </form>
                         @endif
                     @endif

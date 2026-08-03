@@ -39,11 +39,9 @@
                             {{ $review->is_approved ? 'Masquer' : 'Approuver' }}
                         </button>
                     </form>
-                    <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST"
-                          onsubmit="return confirm('Supprimer cet avis ?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-50">Supprimer</button>
-                    </form>
+                    <x-confirm-form :action="route('admin.reviews.destroy', $review)" message="Supprimer cet avis de {{ $review->author_name }} ? Cette action est irréversible.">
+                        <button type="submit" class="rounded-full border border-danger-200 px-4 py-2 text-xs font-semibold text-danger-500 transition hover:bg-danger-50">Supprimer</button>
+                    </x-confirm-form>
                 </div>
             </article>
         @empty

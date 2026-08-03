@@ -45,14 +45,21 @@
 
     {{-- Messages flash globaux --}}
     @if (session('success'))
-        <div x-data="{ show: false }" x-show="show" x-cloak x-init="requestAnimationFrame(() => show = true); setTimeout(() => show = false, 5000)"
+        @php
+            $successMsg = session('success');
+            $bumpEvent = str_contains($successMsg, 'panier') ? 'bump-cart' : (str_contains($successMsg, 'favoris') ? 'bump-wishlist' : null);
+        @endphp
+        <div x-data="{ show: false }"
+             x-show="show" x-cloak
+             x-init="requestAnimationFrame(() => show = true); setTimeout(() => show = false, 5000);
+                      @if($bumpEvent) window.dispatchEvent(new CustomEvent('{{ $bumpEvent }}')) @endif"
              x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="-translate-y-6 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
              x-transition:leave="transition duration-200 ease-in" x-transition:leave-end="-translate-y-6 opacity-0"
              class="fixed inset-x-0 top-4 z-50 mx-auto flex w-fit max-w-[90vw] items-center gap-2.5 rounded-full bg-gray-950/90 py-3 pl-4 pr-6 text-sm font-medium text-white shadow-2xl shadow-gray-950/30 backdrop-blur">
             <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-500">
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
             </span>
-            {{ session('success') }}
+            {{ $successMsg }}
         </div>
     @endif
     @if (session('error'))
@@ -84,6 +91,8 @@
             class="fixed bottom-5 left-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-gray-200 bg-white/90 text-gray-600 shadow-lg backdrop-blur transition hover:-translate-y-1 hover:text-primary-600 hover:shadow-xl sm:bottom-6 sm:left-6">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/></svg>
     </button>
+
+    @include('partials.quick-view-modal')
 
 </body>
 </html>

@@ -82,11 +82,9 @@
                                 <td class="px-6 py-3 text-right" x-show="!editing">
                                     <div class="inline-flex items-center gap-1">
                                         <button type="button" @click="editing = true" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-primary-600 transition hover:bg-primary-50">Modifier</button>
-                                        <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST"
-                                              onsubmit="return confirm('Supprimer cette marque ?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-50">Supprimer</button>
-                                        </form>
+                                        <x-confirm-form :action="route('admin.brands.destroy', $brand)" message="Supprimer la marque « {{ $brand->name }} » ? Cette action est irréversible.">
+                                            <button type="submit" class="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-danger-500 transition hover:bg-danger-50">Supprimer</button>
+                                        </x-confirm-form>
                                     </div>
                                 </td>
                             </tr>

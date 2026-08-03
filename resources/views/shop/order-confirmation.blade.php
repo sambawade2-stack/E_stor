@@ -18,9 +18,7 @@
         </div>
 
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="{{ route('shop.catalog') }}" class="rounded-full bg-primary-600 px-7 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-700">
-                Continuer mes achats
-            </a>
+            <x-btn href="{{ route('shop.catalog') }}" size="lg">Continuer mes achats</x-btn>
             <a href="{{ whatsapp_link('Bonjour ! J\'ai une question sur ma commande '.$order->order_number) }}" target="_blank" rel="noopener"
                class="rounded-full border-2 border-emerald-500 px-7 py-3 text-center text-sm font-semibold text-emerald-600 transition hover:bg-emerald-500 hover:text-white">
                 Nous contacter sur WhatsApp

@@ -184,11 +184,9 @@
                                     <button type="submit" class="rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-gray-700 hover:bg-white">Principale</button>
                                 </form>
                             @endunless
-                            <form action="{{ route('admin.products.images.destroy', [$product, $image]) }}" method="POST"
-                                  onsubmit="return confirm('Supprimer cette image ?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="rounded-full bg-red-500/90 px-2 py-1 text-[10px] font-bold text-white hover:bg-red-500">✕</button>
-                            </form>
+                            <x-confirm-form :action="route('admin.products.images.destroy', [$product, $image])" message="Supprimer cette image du produit ?">
+                                <button type="submit" class="rounded-full bg-danger-500/90 px-2 py-1 text-[10px] font-bold text-white hover:bg-danger-500">✕</button>
+                            </x-confirm-form>
                         </div>
                     </div>
                 @endforeach

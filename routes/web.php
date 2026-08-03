@@ -40,6 +40,7 @@ Route::name('shop.')->group(function () {
     Route::get('/categorie/{category:slug}', [CatalogController::class, 'category'])->name('category');
     Route::get('/promotions', [CatalogController::class, 'promotions'])->name('promotions');
     Route::get('/produit/{product:slug}', [ProductController::class, 'show'])->name('product');
+    Route::get('/produit/{product:slug}/apercu', [ProductController::class, 'quickView'])->name('product.quick-view');
 
     Route::get('/favoris', [WishlistController::class, 'index'])->name('wishlist');
     Route::post('/favoris/{product:slug}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

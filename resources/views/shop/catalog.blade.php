@@ -3,15 +3,11 @@
     {{-- Fil d'Ariane + titre --}}
     <div class="border-b border-gray-100 bg-gray-50/70">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <nav class="mb-2 text-xs text-gray-400" aria-label="Fil d'Ariane">
-                <a href="{{ route('shop.home') }}" class="hover:text-primary-600">Accueil</a>
-                <span class="mx-1.5">/</span>
-                @if ($category)
-                    <a href="{{ route('shop.catalog') }}" class="hover:text-primary-600">Catalogue</a>
-                    <span class="mx-1.5">/</span>
-                @endif
-                <span class="text-gray-600">{{ $title }}</span>
-            </nav>
+            <x-breadcrumb :items="array_filter([
+                ['label' => 'Accueil', 'url' => route('shop.home')],
+                $category ? ['label' => 'Catalogue', 'url' => route('shop.catalog')] : null,
+                ['label' => $title],
+            ])" />
             <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">{{ $title }}</h1>
             @if ($category?->description)
                 <p class="mt-1.5 max-w-2xl text-sm text-gray-500">{{ $category->description }}</p>
@@ -86,9 +82,10 @@
                     </label>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="flex-1 rounded-full bg-primary-600 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">Filtrer</button>
-                        <a href="{{ $category ? route('shop.category', $category) : ($onSaleOnly ? route('shop.promotions') : route('shop.catalog')) }}"
-                           class="rounded-full border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500 transition hover:bg-gray-50">Réinitialiser</a>
+                        <x-btn type="submit" class="flex-1">Filtrer</x-btn>
+                        <x-btn href="{{ $category ? route('shop.category', $category) : ($onSaleOnly ? route('shop.promotions') : route('shop.catalog')) }}" variant="outline">
+                            Réinitialiser
+                        </x-btn>
                     </div>
                 </form>
             </aside>

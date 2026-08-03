@@ -3,13 +3,11 @@
 
     <div class="border-b border-gray-100 bg-gray-50/70">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <nav class="mb-2 text-xs text-gray-400" aria-label="Fil d'Ariane">
-                <a href="{{ route('dashboard') }}" class="hover:text-primary-600">Mon compte</a>
-                <span class="mx-1.5">/</span>
-                <a href="{{ route('account.orders') }}" class="hover:text-primary-600">Mes commandes</a>
-                <span class="mx-1.5">/</span>
-                <span class="text-gray-600">{{ $order->order_number }}</span>
-            </nav>
+            <x-breadcrumb :items="[
+                ['label' => 'Mon compte', 'url' => route('dashboard')],
+                ['label' => 'Mes commandes', 'url' => route('account.orders')],
+                ['label' => $order->order_number],
+            ]" />
             <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Commande {{ $order->order_number }}</h1>
         </div>
     </div>

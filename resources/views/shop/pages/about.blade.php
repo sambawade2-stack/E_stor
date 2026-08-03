@@ -36,9 +36,7 @@
             </ul>
         </section>
 
-        <a href="{{ route('shop.catalog') }}" class="inline-block rounded-full bg-primary-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-primary-700">
-            Découvrir nos produits
-        </a>
+        <x-btn href="{{ route('shop.catalog') }}" size="lg">Découvrir nos produits</x-btn>
     </div>
 
 </x-shop-layout>

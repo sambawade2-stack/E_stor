@@ -104,5 +104,7 @@
         </main>
     </div>
 
+    @include('partials.confirm-modal')
+
 </body>
 </html>

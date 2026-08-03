@@ -18,9 +18,7 @@
                     <div class="rounded-2xl border border-dashed border-gray-200 py-20 text-center">
                         <p class="font-semibold text-gray-900">Aucune commande pour le moment</p>
                         <p class="mt-1 text-sm text-gray-500">Vos commandes apparaîtront ici après votre premier achat.</p>
-                        <a href="{{ route('shop.catalog') }}" class="mt-5 inline-block rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700">
-                            Découvrir le catalogue
-                        </a>
+                        <x-btn href="{{ route('shop.catalog') }}" class="mt-5">Découvrir le catalogue</x-btn>
                     </div>
                 @else
                     <ul class="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-100">
