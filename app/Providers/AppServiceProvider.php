@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\Review;
 use App\Services\Cart\CartService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -47,6 +50,19 @@ class AppServiceProvider extends ServiceProvider
             $model::saved(fn () => Cache::forget('sitemap.xml'));
             $model::deleted(fn () => Cache::forget('sitemap.xml'));
         }
+
+        // L'accueil (sections mises en cache 10 min) suit tout ce qu'il affiche :
+        // produits, images, catégories, marques, avis. Sans ça, un produit ou
+        // une image ajoutée depuis l'admin peut sembler « ne pas s'afficher »
+        // pendant jusqu'à 10 minutes.
+        foreach ([Product::class, ProductImage::class, Category::class, Brand::class, Review::class] as $model) {
+            $model::saved(fn () => Cache::forget('home.sections'));
+            $model::deleted(fn () => Cache::forget('home.sections'));
+        }
+
+        // Menu des catégories (header/footer), même logique
+        Category::saved(fn () => Cache::forget('nav.categories'));
+        Category::deleted(fn () => Cache::forget('nav.categories'));
 
         // Catégories du menu, partagées avec le header et le footer publics
         View::composer(['components.shop-layout', 'partials.shop.*'], function ($view) {

@@ -7,7 +7,6 @@ use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
 use App\Services\Images\ImageService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -61,7 +60,6 @@ class CategoryController extends Controller
 
         $this->images->delete($category->image);
         $category->delete();
-        Cache::forget('nav.categories');
 
         return redirect()->route('admin.categories.index')->with('success', 'Catégorie supprimée.');
     }
@@ -79,7 +77,5 @@ class CategoryController extends Controller
         }
 
         $category->fill($data)->save();
-
-        Cache::forget('nav.categories');
     }
 }
