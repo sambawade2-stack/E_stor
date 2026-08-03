@@ -55,26 +55,77 @@
                 </dl>
             </div>
 
-            {{-- Visuel hero : produit vedette --}}
+            {{-- Visuel hero : diaporama des produits vedettes --}}
             @if ($featured->isNotEmpty())
-                @php $hero = $featured->first(); @endphp
-                <div data-animate style="--d: 200ms" class="relative hidden lg:block">
+                @php
+                    $slides = $featured->take(5)->map(fn ($p) => [
+                        'url' => route('shop.product', $p),
+                        'image' => $p->primaryImage?->url() ?? asset('images/placeholder-product.svg'),
+                        'category' => $p->category->name,
+                        'name' => $p->name,
+                        'price' => format_price($p->current_price),
+                    ]);
+                @endphp
+                <div data-animate style="--d: 200ms" class="relative hidden lg:block"
+                     x-data="{
+                        slides: @js($slides),
+                        active: 0,
+                        timer: null,
+                        paused: false,
+                        next() { this.active = (this.active + 1) % this.slides.length },
+                        prev() { this.active = (this.active - 1 + this.slides.length) % this.slides.length },
+                     }"
+                     x-init="if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                        timer = setInterval(() => { if (!paused) next() }, 4500);
+                        $el.addEventListener('mouseenter', () => paused = true);
+                        $el.addEventListener('mouseleave', () => paused = false);
+                     }">
                     <div class="animate-float mx-auto max-w-md rounded-3xl border border-white/10 bg-white/[0.07] p-8 shadow-2xl shadow-primary-900/40 backdrop-blur-xl">
-                        <div class="overflow-hidden rounded-2xl">
-                            <img src="{{ $hero->primaryImage?->url() ?? asset('images/placeholder-product.svg') }}"
-                                 alt="{{ $hero->name }}" class="aspect-square w-full object-cover transition duration-700 hover:scale-105" loading="eager">
+
+                        {{-- Image (fondu enchaîné entre les produits) --}}
+                        <div class="group/slide relative aspect-square overflow-hidden rounded-2xl">
+                            <template x-for="(slide, index) in slides" :key="index">
+                                <img :src="slide.image" :alt="slide.name" x-show="active === index"
+                                     x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-105" x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-300 absolute inset-0" x-transition:leave-end="opacity-0"
+                                     :loading="index === 0 ? 'eager' : 'lazy'"
+                                     class="absolute inset-0 h-full w-full object-cover">
+                            </template>
+
+                            {{-- Flèches (survol desktop) --}}
+                            <button type="button" @click="prev()" x-show="slides.length > 1" aria-label="Produit précédent"
+                                    class="absolute left-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white opacity-0 backdrop-blur transition duration-300 hover:bg-gray-950/70 group-hover/slide:opacity-100">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                            </button>
+                            <button type="button" @click="next()" x-show="slides.length > 1" aria-label="Produit suivant"
+                                    class="absolute right-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white opacity-0 backdrop-blur transition duration-300 hover:bg-gray-950/70 group-hover/slide:opacity-100">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                            </button>
                         </div>
+
+                        {{-- Infos produit --}}
                         <div class="mt-5 flex items-center justify-between gap-4">
-                            <div>
-                                <p class="text-xs uppercase tracking-wide text-gray-400">{{ $hero->category->name }}</p>
-                                <p class="mt-0.5 line-clamp-1 font-semibold">{{ $hero->name }}</p>
+                            <div class="min-w-0">
+                                <p class="text-xs uppercase tracking-wide text-gray-400" x-text="slides[active].category"></p>
+                                <p class="mt-0.5 line-clamp-1 font-semibold" x-text="slides[active].name"></p>
                             </div>
-                            <p class="shrink-0 text-lg font-extrabold text-primary-400">{{ format_price($hero->current_price) }}</p>
+                            <p class="shrink-0 text-lg font-extrabold text-primary-400" x-text="slides[active].price"></p>
                         </div>
-                        <a href="{{ route('shop.product', $hero) }}"
+
+                        <a :href="slides[active].url"
                            class="btn-shine mt-4 block rounded-full bg-white py-2.5 text-center text-sm font-semibold text-gray-900 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/20">
                             Voir le produit
                         </a>
+
+                        {{-- Puces de navigation --}}
+                        <div class="mt-5 flex items-center justify-center gap-2" x-show="slides.length > 1">
+                            <template x-for="(slide, index) in slides" :key="index">
+                                <button type="button" @click="active = index" :aria-label="'Voir le produit ' + (index + 1)" :aria-current="active === index"
+                                        class="h-1.5 rounded-full transition-all duration-300"
+                                        :class="active === index ? 'w-6 bg-white' : 'w-1.5 bg-white/30 hover:bg-white/50'">
+                                </button>
+                            </template>
+                        </div>
                     </div>
                 </div>
             @endif
