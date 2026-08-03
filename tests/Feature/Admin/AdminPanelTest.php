@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Models\User;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminPanelTest extends TestCase
@@ -95,6 +97,42 @@ class AdminPanelTest extends TestCase
             'causer_id' => $this->admin->id,
             'event' => 'created',
         ]);
+    }
+
+    public function test_an_admin_can_upload_and_optimize_a_product_image(): void
+    {
+        Storage::fake('public');
+
+        $category = Category::create(['name' => 'Chargeurs']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Chargeur Rapide 45W',
+            'sku' => 'ES-TEST-45W',
+            'price' => 15000,
+            'stock_quantity' => 10,
+        ]);
+
+        $this->actingAs($this->admin)->put(route('admin.products.update', $product), [
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'category_id' => $category->id,
+            'price' => 15000,
+            'stock_quantity' => 10,
+            'is_active' => '1',
+            'images' => [UploadedFile::fake()->image('photo.jpg', 1600, 1600)],
+        ])->assertRedirect(route('admin.products.index'));
+
+        $product->refresh();
+
+        $this->assertCount(1, $product->images);
+
+        $image = $product->images->first();
+        $this->assertTrue($image->is_primary);
+        $this->assertStringEndsWith('.webp', $image->path);
+        Storage::disk('public')->assertExists($image->path);
+
+        // L'image a bien été réencodée en WebP et redimensionnée (pas juste copiée telle quelle)
+        $this->assertLessThan(1600, getimagesizefromstring(Storage::disk('public')->get($image->path))[0]);
     }
 
     public function test_order_status_transitions_follow_the_allowed_flow(): void

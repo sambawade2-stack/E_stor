@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
 
 class ImageService
@@ -18,13 +19,13 @@ class ImageService
      */
     public function store(UploadedFile $file, string $directory, int $maxWidth = 1200, int $quality = 82): string
     {
-        $image = ImageManager::withDriver(Driver::class)
-            ->read($file->getPathname())
+        $image = ImageManager::usingDriver(Driver::class)
+            ->decodePath($file->getPathname())
             ->scaleDown(width: $maxWidth);
 
         $path = trim($directory, '/').'/'.Str::uuid()->toString().'.webp';
 
-        Storage::disk('public')->put($path, (string) $image->toWebp($quality));
+        Storage::disk('public')->put($path, (string) $image->encode(new WebpEncoder(quality: $quality)));
 
         return $path;
     }
