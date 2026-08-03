@@ -92,6 +92,8 @@
 
             {{-- ========================= RÉSULTATS ======================= --}}
             <div>
+                <x-filter-chips :category="$category" :onSaleOnly="$onSaleOnly" :brands="$brands" class="mb-5" />
+
                 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
                     <p class="text-sm text-gray-500">
                         <strong class="font-semibold text-gray-900">{{ $products->total() }}</strong> produit{{ $products->total() > 1 ? 's' : '' }}

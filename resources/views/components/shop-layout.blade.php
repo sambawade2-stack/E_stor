@@ -41,6 +41,8 @@
 </head>
 <body class="min-h-screen bg-white font-sans text-gray-900 antialiased">
 
+    @include('partials.nav-progress')
+
     @include('partials.shop.header')
 
     {{-- Messages flash globaux --}}

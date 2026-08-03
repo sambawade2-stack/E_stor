@@ -17,6 +17,8 @@
 </head>
 <body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased" x-data="{ sidebarOpen: false }">
 
+    @include('partials.nav-progress')
+
     {{-- Sidebar --}}
     <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full bg-gray-950 text-gray-300 transition-transform lg:translate-x-0"
            :class="sidebarOpen && 'translate-x-0'">
