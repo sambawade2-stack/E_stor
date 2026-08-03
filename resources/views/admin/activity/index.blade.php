@@ -3,7 +3,7 @@
     <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-xs uppercase tracking-wide text-gray-400">
+                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-sm uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Date</th>
                         <th class="px-6 py-3 font-semibold">Utilisateur</th>
@@ -33,7 +33,7 @@
                             </td>
                             <td class="max-w-md px-6 py-3.5">
                                 @if ($attrs = data_get($activity->properties, 'attributes'))
-                                    <details class="text-xs text-gray-500">
+                                    <details class="text-sm text-gray-500">
                                         <summary class="cursor-pointer font-medium text-primary-600">{{ count($attrs) }} champ{{ count($attrs) > 1 ? 's' : '' }}</summary>
                                         <dl class="mt-2 space-y-1">
                                             @foreach ($attrs as $key => $value)

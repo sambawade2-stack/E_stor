@@ -10,7 +10,7 @@
     <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-xs uppercase tracking-wide text-gray-400">
+                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-sm uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Code</th>
                         <th class="px-6 py-3 font-semibold">Remise</th>
@@ -30,7 +30,7 @@
                             </td>
                             <td class="px-6 py-3 text-gray-500">{{ $coupon->min_order_amount ? format_price($coupon->min_order_amount) : '—' }}</td>
                             <td class="px-6 py-3 text-gray-500">{{ $coupon->used_count }}{{ $coupon->max_uses ? ' / '.$coupon->max_uses : '' }}</td>
-                            <td class="px-6 py-3 text-xs text-gray-500">
+                            <td class="px-6 py-3 text-sm text-gray-500">
                                 @if ($coupon->starts_at || $coupon->expires_at)
                                     {{ $coupon->starts_at?->format('d/m/Y') ?? '…' }} → {{ $coupon->expires_at?->format('d/m/Y') ?? '…' }}
                                 @else

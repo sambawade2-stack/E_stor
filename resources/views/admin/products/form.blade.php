@@ -11,19 +11,19 @@
 
             {{-- Informations générales --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
-                <h2 class="mb-5 font-bold">Informations générales</h2>
+                <h2 class="mb-5 text-lg font-bold">Informations générales</h2>
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div class="sm:col-span-2">
                         <label for="name" class="mb-1.5 block text-sm font-medium text-gray-700">Nom du produit *</label>
                         <input type="text" id="name" name="name" required value="{{ old('name', $product->name) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('name')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('name')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="sku" class="mb-1.5 block text-sm font-medium text-gray-700">SKU *</label>
                         <input type="text" id="sku" name="sku" required value="{{ old('sku', $product->sku) }}"
                                class="w-full rounded-xl border-gray-200 text-sm uppercase focus:border-primary-500 focus:ring-primary-500">
-                        @error('sku')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('sku')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="category_id" class="mb-1.5 block text-sm font-medium text-gray-700">Catégorie *</label>
@@ -33,7 +33,7 @@
                                 <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id) == $category->id)>{{ $category->name }}</option>
                             @endforeach
                         </select>
-                        @error('category_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('category_id')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="brand_id" class="mb-1.5 block text-sm font-medium text-gray-700">Marque</label>
@@ -49,13 +49,13 @@
                         <input type="text" id="short_description" name="short_description" maxlength="500"
                                value="{{ old('short_description', $product->short_description) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('short_description')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('short_description')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
                         <label for="description" class="mb-1.5 block text-sm font-medium text-gray-700">Description complète</label>
                         <textarea id="description" name="description" rows="6"
                                   class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">{{ old('description', $product->description) }}</textarea>
-                        @error('description')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('description')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div class="sm:col-span-2">
                         <label for="features_text" class="mb-1.5 block text-sm font-medium text-gray-700">
@@ -63,26 +63,26 @@
                         </label>
                         <textarea id="features_text" name="features_text" rows="4" placeholder="Capacité : 20000 mAh&#10;Connectivité : Bluetooth 5.3"
                                   class="w-full rounded-xl border-gray-200 font-mono text-sm focus:border-primary-500 focus:ring-primary-500">{{ old('features_text', collect($product->features ?? [])->map(fn ($v, $k) => "$k : $v")->implode("\n")) }}</textarea>
-                        @error('features_text')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('features_text')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                 </div>
             </section>
 
             {{-- Prix & stock --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
-                <h2 class="mb-5 font-bold">Prix & stock</h2>
+                <h2 class="mb-5 text-lg font-bold">Prix & stock</h2>
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div>
                         <label for="price" class="mb-1.5 block text-sm font-medium text-gray-700">Prix ({{ setting('currency_symbol') }}) *</label>
                         <input type="number" id="price" name="price" required min="0" step="1" value="{{ old('price', $product->price === null ? '' : (int) $product->price) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('price')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('price')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="sale_price" class="mb-1.5 block text-sm font-medium text-gray-700">Prix promo</label>
                         <input type="number" id="sale_price" name="sale_price" min="0" step="1" value="{{ old('sale_price', $product->sale_price === null ? '' : (int) $product->sale_price) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('sale_price')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('sale_price')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="sale_starts_at" class="mb-1.5 block text-sm font-medium text-gray-700">Début promo</label>
@@ -95,13 +95,13 @@
                         <input type="datetime-local" id="sale_ends_at" name="sale_ends_at"
                                value="{{ old('sale_ends_at', $product->sale_ends_at?->format('Y-m-d\TH:i')) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('sale_ends_at')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('sale_ends_at')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="stock_quantity" class="mb-1.5 block text-sm font-medium text-gray-700">Stock *</label>
                         <input type="number" id="stock_quantity" name="stock_quantity" required min="0" value="{{ old('stock_quantity', $product->stock_quantity ?? 0) }}"
                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                        @error('stock_quantity')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                        @error('stock_quantity')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label for="low_stock_threshold" class="mb-1.5 block text-sm font-medium text-gray-700">Seuil de stock faible</label>
@@ -113,7 +113,7 @@
 
             {{-- SEO --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
-                <h2 class="mb-5 font-bold">SEO <span class="text-xs font-normal text-gray-400">(facultatif — généré automatiquement sinon)</span></h2>
+                <h2 class="mb-5 text-lg font-bold">SEO <span class="text-xs font-normal text-gray-400">(facultatif — généré automatiquement sinon)</span></h2>
                 <div class="grid gap-5">
                     <div>
                         <label for="meta_title" class="mb-1.5 block text-sm font-medium text-gray-700">Meta title</label>
@@ -132,7 +132,7 @@
         {{-- Colonne latérale --}}
         <div class="space-y-6">
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
-                <h2 class="mb-4 font-bold">Publication</h2>
+                <h2 class="mb-4 text-lg font-bold">Publication</h2>
                 <label class="flex items-center gap-2.5 text-sm">
                     <input type="hidden" name="is_active" value="0">
                     <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active ?? true))
@@ -156,12 +156,12 @@
 
             {{-- Images --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
-                <h2 class="mb-4 font-bold">Images</h2>
+                <h2 class="mb-4 text-lg font-bold">Images</h2>
 
                 <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp"
                        class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-600 hover:file:bg-primary-100">
-                <p class="mt-2 text-xs text-gray-400">JPG, PNG ou WebP — 10 Mo max par image, 8 images max. Optimisées automatiquement en WebP.</p>
-                @error('images.*')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                <p class="mt-2 text-sm text-gray-500">JPG, PNG ou WebP — 10 Mo max par image, 8 images max. Optimisées automatiquement en WebP.</p>
+                @error('images.*')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
             </section>
         </div>
     </form>
@@ -169,7 +169,7 @@
     {{-- Galerie existante (hors formulaire principal : chaque action a son propre formulaire) --}}
     @if ($editing && $product->images->isNotEmpty())
         <section class="mt-6 rounded-2xl border border-gray-100 bg-white p-6 xl:max-w-[66%]">
-            <h2 class="mb-4 font-bold">Images actuelles</h2>
+            <h2 class="mb-4 text-lg font-bold">Images actuelles</h2>
             <div class="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
                 @foreach ($product->images as $image)
                     <div class="group relative overflow-hidden rounded-xl border {{ $image->is_primary ? 'border-primary-500 ring-2 ring-primary-200' : 'border-gray-100' }}">

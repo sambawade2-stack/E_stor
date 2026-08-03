@@ -13,13 +13,13 @@
                     <label for="name" class="mb-1.5 block text-sm font-medium text-gray-700">Nom *</label>
                     <input type="text" id="name" name="name" required value="{{ old('name', $category->name) }}"
                            class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                    @error('name')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('name')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div class="sm:col-span-2">
                     <label for="description" class="mb-1.5 block text-sm font-medium text-gray-700">Description</label>
                     <textarea id="description" name="description" rows="3"
                               class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">{{ old('description', $category->description) }}</textarea>
-                    @error('description')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('description')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="parent_id" class="mb-1.5 block text-sm font-medium text-gray-700">Catégorie parente</label>
@@ -29,7 +29,7 @@
                             <option value="{{ $parent->id }}" @selected(old('parent_id', $category->parent_id) == $parent->id)>{{ $parent->name }}</option>
                         @endforeach
                     </select>
-                    @error('parent_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('parent_id')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="sort_order" class="mb-1.5 block text-sm font-medium text-gray-700">Ordre d'affichage</label>
@@ -43,7 +43,7 @@
                     @endif
                     <input type="file" name="image" accept="image/jpeg,image/png,image/webp"
                            class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-600 hover:file:bg-primary-100">
-                    @error('image')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('image')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <label class="flex items-center gap-2.5 text-sm sm:col-span-2">
                     <input type="hidden" name="is_active" value="0">

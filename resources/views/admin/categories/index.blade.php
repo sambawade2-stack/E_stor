@@ -10,7 +10,7 @@
     <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-xs uppercase tracking-wide text-gray-400">
+                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-sm uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Catégorie</th>
                         <th class="px-6 py-3 font-semibold">Parent</th>
@@ -34,7 +34,7 @@
                                     @endif
                                     <div>
                                         <p class="font-semibold">{{ $category->name }}</p>
-                                        <p class="text-xs text-gray-400">/{{ $category->slug }}</p>
+                                        <p class="text-sm text-gray-500">/{{ $category->slug }}</p>
                                     </div>
                                 </div>
                             </td>

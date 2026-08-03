@@ -13,7 +13,7 @@
                     <label for="code" class="mb-1.5 block text-sm font-medium text-gray-700">Code *</label>
                     <input type="text" id="code" name="code" required value="{{ old('code', $coupon->code) }}" placeholder="BIENVENUE10"
                            class="w-full rounded-xl border-gray-200 text-sm uppercase focus:border-primary-500 focus:ring-primary-500">
-                    @error('code')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('code')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="type" class="mb-1.5 block text-sm font-medium text-gray-700">Type de remise *</label>
@@ -27,7 +27,7 @@
                     <label for="value" class="mb-1.5 block text-sm font-medium text-gray-700">Valeur * <span class="text-gray-400">({{ setting('currency_symbol') }} ou %)</span></label>
                     <input type="number" id="value" name="value" required min="0" step="0.01" value="{{ old('value', $coupon->value === null ? '' : $coupon->value + 0) }}"
                            class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                    @error('value')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('value')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="min_order_amount" class="mb-1.5 block text-sm font-medium text-gray-700">Montant minimum de commande</label>
@@ -50,7 +50,7 @@
                     <label for="expires_at" class="mb-1.5 block text-sm font-medium text-gray-700">Fin de validité</label>
                     <input type="datetime-local" id="expires_at" name="expires_at" value="{{ old('expires_at', $coupon->expires_at?->format('Y-m-d\TH:i')) }}"
                            class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                    @error('expires_at')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    @error('expires_at')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <label class="flex items-center gap-2.5 text-sm sm:col-span-2">
                     <input type="hidden" name="is_active" value="0">

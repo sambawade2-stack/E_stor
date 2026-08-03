@@ -13,7 +13,7 @@
         <div class="space-y-6 xl:col-span-2">
             {{-- Articles --}}
             <section class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-                <h2 class="border-b border-gray-100 px-6 py-4 font-bold">Articles</h2>
+                <h2 class="border-b border-gray-100 px-6 py-4 text-lg font-bold">Articles</h2>
                 <table class="w-full text-sm">
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($order->items as $item)
@@ -24,7 +24,7 @@
                                     @else
                                         <span class="font-medium">{{ $item->product_name }}</span>
                                     @endif
-                                    <span class="block text-xs text-gray-400">{{ $item->sku }}</span>
+                                    <span class="block text-sm text-gray-500">{{ $item->sku }}</span>
                                 </td>
                                 <td class="px-6 py-3.5 text-gray-500">{{ format_price($item->unit_price) }} × {{ $item->quantity }}</td>
                                 <td class="px-6 py-3.5 text-right font-semibold">{{ format_price($item->total) }}</td>
@@ -45,13 +45,13 @@
             {{-- Paiements --}}
             @if ($order->payments->isNotEmpty())
                 <section class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-                    <h2 class="border-b border-gray-100 px-6 py-4 font-bold">Transactions</h2>
+                    <h2 class="border-b border-gray-100 px-6 py-4 text-lg font-bold">Transactions</h2>
                     <table class="w-full text-sm">
                         <tbody class="divide-y divide-gray-50">
                             @foreach ($order->payments as $payment)
                                 <tr>
                                     <td class="px-6 py-3">{{ $payment->provider->label() }}</td>
-                                    <td class="px-6 py-3 font-mono text-xs text-gray-400">{{ $payment->provider_reference ?? '—' }}</td>
+                                    <td class="px-6 py-3 font-mono text-sm text-gray-500">{{ $payment->provider_reference ?? '—' }}</td>
                                     <td class="px-6 py-3">{{ format_price($payment->amount) }}</td>
                                     <td class="px-6 py-3">{{ $payment->status->label() }}</td>
                                     <td class="px-6 py-3 text-gray-400">{{ $payment->created_at->format('d/m/Y H:i') }}</td>
@@ -68,7 +68,7 @@
             {{-- Statut --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="font-bold">Statut</h2>
+                    <h2 class="text-lg font-bold">Statut</h2>
                     <x-order-status-badge :status="$order->status" />
                 </div>
 
@@ -82,7 +82,7 @@
                         </select>
                         <button type="submit" class="shrink-0 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700">OK</button>
                     </form>
-                    <p class="mt-3 text-xs text-gray-400">
+                    <p class="mt-3 text-sm text-gray-500">
                         L'annulation remet automatiquement les articles en stock.
                         Le passage à « Livrée » encaisse le paiement à la livraison.
                     </p>
@@ -90,7 +90,7 @@
                     <p class="text-sm text-gray-400">Statut final — aucune transition possible.</p>
                 @endif
 
-                <dl class="mt-5 space-y-1.5 border-t border-gray-100 pt-4 text-xs text-gray-500">
+                <dl class="mt-5 space-y-1.5 border-t border-gray-100 pt-4 text-sm text-gray-500">
                     <div class="flex justify-between"><dt>Créée le</dt><dd>{{ $order->created_at->format('d/m/Y H:i') }}</dd></div>
                     @if ($order->paid_at)<div class="flex justify-between"><dt>Payée le</dt><dd>{{ $order->paid_at->format('d/m/Y H:i') }}</dd></div>@endif
                     @if ($order->shipped_at)<div class="flex justify-between"><dt>Expédiée le</dt><dd>{{ $order->shipped_at->format('d/m/Y H:i') }}</dd></div>@endif
@@ -101,7 +101,7 @@
 
             {{-- Client --}}
             <section class="rounded-2xl border border-gray-100 bg-white p-6 text-sm">
-                <h2 class="mb-4 font-bold">Client</h2>
+                <h2 class="mb-4 text-lg font-bold">Client</h2>
                 <p class="font-semibold">{{ $order->customer_name }}</p>
                 <p class="mt-1 text-gray-500">{{ $order->customer_phone }}</p>
                 @if ($order->customer_email)
@@ -130,7 +130,7 @@
             </section>
 
             <section class="rounded-2xl border border-gray-100 bg-white p-6 text-sm">
-                <h2 class="mb-3 font-bold">Paiement</h2>
+                <h2 class="mb-3 text-lg font-bold">Paiement</h2>
                 <p class="text-gray-600">{{ $order->payment_provider?->label() ?? '—' }}</p>
                 <p class="mt-1">
                     @if ($order->isPaid())

@@ -25,8 +25,8 @@
         <div class="flex h-16 items-center gap-2.5 border-b border-white/10 px-5">
             <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/10 text-base font-extrabold leading-none text-white"><span class="whitespace-nowrap">E<span class="text-primary-500">S</span></span></span>
             <div class="leading-tight">
-                <p class="text-sm font-bold text-white">{{ setting('shop_name') }}</p>
-                <p class="text-[10px] uppercase tracking-widest text-gray-500">Administration</p>
+                <p class="text-base font-bold text-white">{{ setting('shop_name') }}</p>
+                <p class="text-xs uppercase tracking-widest text-gray-400">Administration</p>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
 
             @foreach ($links as $link)
                 <a href="{{ route($link['route']) }}"
-                   class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition {{ request()->routeIs($link['match']) ? 'bg-primary-600 text-white' : 'hover:bg-white/5 hover:text-white' }}">
+                   class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[15px] font-medium transition {{ request()->routeIs($link['match']) ? 'bg-primary-600 text-white' : 'hover:bg-white/5 hover:text-white' }}">
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $link['icon'] }}"/></svg>
                     {{ $link['label'] }}
                 </a>
@@ -73,14 +73,14 @@
                 <button @click="sidebarOpen = true" class="grid h-10 w-10 place-items-center rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden" aria-label="Menu">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
                 </button>
-                <h1 class="text-lg font-bold">{{ $title }}</h1>
+                <h1 class="text-xl font-bold">{{ $title }}</h1>
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="hidden text-sm text-gray-500 sm:block">{{ auth()->user()->name }}</span>
+                <span class="hidden text-sm font-medium text-gray-600 sm:block">{{ auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50">
+                    <button type="submit" class="rounded-full border border-gray-200 px-4 py-1.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
                         Déconnexion
                     </button>
                 </form>

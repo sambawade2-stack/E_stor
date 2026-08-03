@@ -27,7 +27,7 @@
     <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-xs uppercase tracking-wide text-gray-400">
+                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-sm uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Produit</th>
                         <th class="px-6 py-3 font-semibold">Catégorie</th>
@@ -46,7 +46,7 @@
                                          alt="" class="h-11 w-11 rounded-lg border border-gray-100 object-cover">
                                     <div class="min-w-0">
                                         <p class="line-clamp-1 font-semibold">{{ $product->name }}</p>
-                                        <p class="text-xs text-gray-400">{{ $product->sku }}@if($product->brand) · {{ $product->brand->name }}@endif</p>
+                                        <p class="text-sm text-gray-500">{{ $product->sku }}@if($product->brand) · {{ $product->brand->name }}@endif</p>
                                     </div>
                                 </div>
                             </td>
@@ -54,7 +54,7 @@
                             <td class="px-6 py-3">
                                 <span class="font-semibold">{{ format_price($product->current_price) }}</span>
                                 @if ($product->isOnSale())
-                                    <span class="block text-xs text-gray-400 line-through">{{ format_price($product->price) }}</span>
+                                    <span class="block text-sm text-gray-500 line-through">{{ format_price($product->price) }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-3">

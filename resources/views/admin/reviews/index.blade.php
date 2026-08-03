@@ -24,7 +24,7 @@
                             <span class="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-600">En attente</span>
                         @endif
                     </div>
-                    <p class="mt-1 text-xs text-gray-400">
+                    <p class="mt-1 text-sm text-gray-500">
                         Sur <a href="{{ route('shop.product', $review->product) }}" target="_blank" class="font-medium text-primary-600 hover:underline">{{ $review->product->name }}</a>
                         · {{ $review->created_at->format('d/m/Y') }}
                     </p>

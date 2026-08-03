@@ -17,7 +17,7 @@
     <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-xs uppercase tracking-wide text-gray-400">
+                <thead class="border-b border-gray-100 bg-gray-50/70 text-left text-sm uppercase tracking-wide text-gray-500">
                     <tr>
                         <th class="px-6 py-3 font-semibold">Commande</th>
                         <th class="px-6 py-3 font-semibold">Client</th>
@@ -33,11 +33,11 @@
                         <tr class="transition hover:bg-gray-50/70">
                             <td class="px-6 py-3.5">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="font-bold text-primary-600 hover:underline">{{ $order->order_number }}</a>
-                                <span class="block text-xs text-gray-400">{{ $order->items_count }} article{{ $order->items_count > 1 ? 's' : '' }}</span>
+                                <span class="block text-sm text-gray-500">{{ $order->items_count }} article{{ $order->items_count > 1 ? 's' : '' }}</span>
                             </td>
                             <td class="px-6 py-3.5">
                                 <span class="block font-medium">{{ $order->customer_name }}</span>
-                                <span class="text-xs text-gray-400">{{ $order->customer_phone }}</span>
+                                <span class="text-sm text-gray-500">{{ $order->customer_phone }}</span>
                             </td>
                             <td class="px-6 py-3.5 text-gray-500">{{ $order->city }}</td>
                             <td class="px-6 py-3.5 font-semibold">{{ format_price($order->total) }}</td>

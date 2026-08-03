@@ -13,6 +13,6 @@
     };
 @endphp
 
-<span {{ $attributes->merge(['class' => "rounded-full px-3 py-1 text-xs font-bold {$classes}"]) }}>
+<span {{ $attributes->merge(['class' => "rounded-full px-3 py-1 text-sm font-bold {$classes}"]) }}>
     {{ $status->label() }}
 </span>
