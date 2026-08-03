@@ -43,15 +43,19 @@ Route::name('shop.')->group(function () {
     Route::get('/produit/{product:slug}/apercu', [ProductController::class, 'quickView'])->name('product.quick-view');
 
     Route::get('/favoris', [WishlistController::class, 'index'])->name('wishlist');
-    Route::post('/favoris/{product:slug}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::post('/favoris/{product:slug}', [WishlistController::class, 'toggle'])
+        ->middleware('throttle:30,1')
+        ->name('wishlist.toggle');
 
+    Route::middleware('throttle:30,1')->group(function () {
+        Route::post('/panier/ajouter/{product:slug}', [CartController::class, 'add'])->name('cart.add');
+        Route::patch('/panier/{product:slug}', [CartController::class, 'update'])->name('cart.update');
+        Route::delete('/panier/{product:slug}', [CartController::class, 'remove'])->name('cart.remove');
+        Route::post('/panier/livraison', [CartController::class, 'setShippingZone'])->name('cart.shipping');
+    });
     Route::get('/panier', [CartController::class, 'index'])->name('cart');
-    Route::post('/panier/ajouter/{product:slug}', [CartController::class, 'add'])->name('cart.add');
-    Route::patch('/panier/{product:slug}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/panier/{product:slug}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/panier/coupon', [CartController::class, 'applyCoupon'])->middleware('throttle:15,1')->name('cart.coupon');
     Route::delete('/panier/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
-    Route::post('/panier/livraison', [CartController::class, 'setShippingZone'])->name('cart.shipping');
 
     Route::get('/commander', [CheckoutController::class, 'show'])->name('checkout');
     Route::post('/commander', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');

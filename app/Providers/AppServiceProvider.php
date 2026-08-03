@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,17 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
         }
+
+        // Règle de mot de passe par défaut (inscription, changement, réinitialisation) :
+        // au moins 8 caractères, majuscule + minuscule + chiffre. En production,
+        // rejette en plus les mots de passe connus comme compromis (API Have I Been
+        // Pwned, k-anonymat — aucun mot de passe en clair n'est transmis).
+        // Désactivé hors production pour ne pas dépendre d'un accès réseau en local/CI.
+        Password::defaults(function () {
+            $rule = Password::min(8)->letters()->mixedCase()->numbers();
+
+            return $this->app->isProduction() ? $rule->uncompromised() : $rule;
+        });
 
         // Garde-fou N+1 : signale les chargements paresseux dans les logs
         // sans jamais casser la page

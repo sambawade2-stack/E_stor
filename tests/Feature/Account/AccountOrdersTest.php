@@ -91,8 +91,8 @@ class AccountOrdersTest extends TestCase
             'name' => 'Awa Ndiaye',
             'email' => 'awa@example.com',
             'phone' => '+221 77 123 45 67',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
         ])->assertRedirect(route('dashboard', absolute: false));
 
         $user = User::where('email', 'awa@example.com')->firstOrFail();

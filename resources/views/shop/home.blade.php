@@ -1,7 +1,7 @@
 <x-shop-layout>
 
     <x-slot:head>
-        <script type="application/ld+json">{!! json_encode([
+        <script type="application/ld+json">{!! json_ld([
             '@context' => 'https://schema.org',
             '@type' => 'OnlineStore',
             'name' => setting('shop_name'),
@@ -11,7 +11,7 @@
             'email' => setting('shop_email'),
             'address' => ['@type' => 'PostalAddress', 'streetAddress' => setting('shop_address')],
             'sameAs' => array_values(array_filter([setting('facebook_url'), setting('instagram_url'), setting('tiktok_url')])),
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+        ]) !!}</script>
     </x-slot:head>
 
     {{-- ============================= HERO ============================= --}}

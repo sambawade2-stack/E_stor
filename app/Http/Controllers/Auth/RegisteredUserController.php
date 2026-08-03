@@ -54,6 +54,10 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Empêche la fixation de session : un identifiant de session
+        // planté avant l'inscription ne doit pas rester valide après.
+        $request->session()->regenerate();
+
         return redirect(route('dashboard', absolute: false));
     }
 }

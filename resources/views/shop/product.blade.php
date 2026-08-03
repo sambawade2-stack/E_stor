@@ -6,7 +6,7 @@
     ogType="product">
 
     <x-slot:head>
-        <script type="application/ld+json">{!! json_encode([
+        <script type="application/ld+json">{!! json_ld([
             '@context' => 'https://schema.org',
             '@type' => 'Product',
             'name' => $product->name,
@@ -27,7 +27,7 @@
                 'ratingValue' => round((float) $product->rating, 1),
                 'reviewCount' => $product->reviews_count,
             ] : null,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+        ]) !!}</script>
     </x-slot:head>
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

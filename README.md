@@ -51,7 +51,7 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 5. Worker de queue : `php artisan queue:work` (superviser avec Supervisor/systemd)
 6. Clés PayDunya (`PAYDUNYA_*`, `PAYDUNYA_MODE=live`) — le paiement en ligne s'active automatiquement dès qu'elles sont renseignées ; déclarer l'IPN `https://votre-domaine/webhooks/paydunya`
 7. Optimisations : `php artisan config:cache route:cache view:cache event:cache` et `npm run build`
-8. HTTPS obligatoire (forcé automatiquement en production) + certificat
+8. HTTPS obligatoire (forcé automatiquement en production) + certificat + décommenter `SESSION_SECURE_COOKIE=true` dans `.env`
 9. Sauvegardes régulières : base de données + `storage/app/public` (images)
 10. Vérifier `https://votre-domaine/sitemap.xml` et soumettre à Google Search Console
 
