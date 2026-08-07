@@ -39,7 +39,7 @@
                 <div class="sm:col-span-2">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">Image</label>
                     @if ($category->image)
-                        <img src="{{ Storage::url($category->image) }}" alt="" class="mb-3 h-20 w-20 rounded-xl border border-gray-100 object-cover">
+                        <img src="{{ Storage::disk('public')->url($category->image) }}" alt="" class="mb-3 h-20 w-20 rounded-xl border border-gray-100 object-cover">
                     @endif
                     <input type="file" name="image" accept="image/jpeg,image/png,image/webp"
                            class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-600 hover:file:bg-primary-100">

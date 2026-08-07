@@ -12,7 +12,8 @@
             'name' => $product->name,
             'sku' => $product->sku,
             'description' => $product->short_description ?: strip_tags((string) $product->description),
-            'image' => $product->images->map(fn ($img) => $img->url())->all() ?: [asset('images/placeholder-product.svg')],
+            // JSON-LD exige des URLs absolues, contrairement à l'affichage
+            'image' => $product->images->map(fn ($img) => url($img->url()))->all() ?: [asset('images/placeholder-product.svg')],
             'brand' => $product->brand ? ['@type' => 'Brand', 'name' => $product->brand->name] : null,
             'category' => $product->category->name,
             'offers' => [

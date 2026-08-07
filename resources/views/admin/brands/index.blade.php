@@ -64,7 +64,7 @@
                                 <td class="px-6 py-3" x-show="!editing">
                                     <div class="flex items-center gap-3">
                                         @if ($brand->logo)
-                                            <img src="{{ Storage::url($brand->logo) }}" alt="" class="h-9 w-9 rounded-lg border border-gray-100 object-contain">
+                                            <img src="{{ Storage::disk('public')->url($brand->logo) }}" alt="" class="h-9 w-9 rounded-lg border border-gray-100 object-contain">
                                         @else
                                             <span class="grid h-9 w-9 place-items-center rounded-lg bg-gray-100 text-xs font-bold text-gray-400">{{ strtoupper(mb_substr($brand->name, 0, 2)) }}</span>
                                         @endif

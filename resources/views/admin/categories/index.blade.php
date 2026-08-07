@@ -26,7 +26,7 @@
                             <td class="px-6 py-3">
                                 <div class="flex items-center gap-3">
                                     @if ($category->image)
-                                        <img src="{{ Storage::url($category->image) }}" alt="" class="h-10 w-10 rounded-lg border border-gray-100 object-cover">
+                                        <img src="{{ Storage::disk('public')->url($category->image) }}" alt="" class="h-10 w-10 rounded-lg border border-gray-100 object-cover">
                                     @else
                                         <span class="grid h-10 w-10 place-items-center rounded-lg bg-gray-100 text-gray-400">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/></svg>

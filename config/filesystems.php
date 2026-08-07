@@ -41,7 +41,13 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // URL relative volontairement : une URL absolue figée sur APP_URL
+            // casse toutes les images dès que le site est consulté depuis une
+            // autre origine (127.0.0.1 au lieu de localhost, autre port, IP du
+            // réseau local, domaine de préproduction…) et se heurte à la CSP
+            // `img-src 'self'` en production. Pour les balises Open Graph et le
+            // JSON-LD, qui exigent une URL absolue, on repasse par url().
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

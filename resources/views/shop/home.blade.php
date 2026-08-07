@@ -333,7 +333,7 @@
                     @foreach ([$brands, $brands] as $loopBrands)
                         @foreach ($loopBrands as $brand)
                             @if ($brand->logo)
-                                <img src="{{ Storage::url($brand->logo) }}" alt="{{ $brand->name }}" loading="lazy" class="h-8 w-auto shrink-0 opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0">
+                                <img src="{{ Storage::disk('public')->url($brand->logo) }}" alt="{{ $brand->name }}" loading="lazy" class="h-8 w-auto shrink-0 opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0">
                             @else
                                 <span class="shrink-0 text-xl font-bold text-gray-300 transition hover:text-primary-500">{{ $brand->name }}</span>
                             @endif

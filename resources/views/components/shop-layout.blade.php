@@ -22,14 +22,15 @@
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ request()->url() }}">
-    <meta property="og:image" content="{{ $ogImage ?? asset('images/placeholder-product.svg') }}">
+    {{-- Open Graph exige une URL absolue : url() complète les chemins /storage --}}
+    <meta property="og:image" content="{{ $ogImage ? url($ogImage) : asset('images/placeholder-product.svg') }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $pageTitle }}">
     <meta name="twitter:description" content="{{ $pageDescription }}">
-    <meta name="twitter:image" content="{{ $ogImage ?? asset('images/placeholder-product.svg') }}">
+    <meta name="twitter:image" content="{{ $ogImage ? url($ogImage) : asset('images/placeholder-product.svg') }}">
 
     @if(setting('favicon_path'))
-        <link rel="icon" href="{{ Storage::url(setting('favicon_path')) }}">
+        <link rel="icon" href="{{ Storage::disk('public')->url(setting('favicon_path')) }}">
     @endif
 
     <link rel="preconnect" href="https://fonts.bunny.net">
