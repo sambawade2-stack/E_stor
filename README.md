@@ -27,12 +27,19 @@ npm run build                  # ou npm run dev
 composer run serve             # démarre avec des limites d'upload relevées (10 Mo/image)
 ```
 
-Admin : `admin@electroniques-stores.com` / mot de passe défini par `ADMIN_DEFAULT_PASSWORD` (`.env`).
+Admin : l'adresse `SHOP_ADMIN_EMAIL` (`.env`). Si `ADMIN_DEFAULT_PASSWORD` est laissé vide,
+le seeder génère un mot de passe aléatoire et l'affiche **une seule fois** dans la console —
+notez-le à ce moment-là.
 
 > ⚠️ N'utilisez pas `php artisan serve` seul pour uploader des images (photos produits, logos…) :
-> la limite `upload_max_filesize` par défaut de PHP (souvent 2 Mo) est ignorée par Laravel et
-> bloque silencieusement l'upload. `composer run serve` relève cette limite pour le serveur de
-> développement. En production (Apache/Nginx + PHP-FPM), `public/.user.ini` s'applique automatiquement.
+> la limite `upload_max_filesize` par défaut de PHP (souvent 2 Mo) est ignorée par le serveur
+> intégré et bloque silencieusement l'upload. `composer run serve` délègue à [`bin/serve`](bin/serve),
+> qui relève cette limite. En production (Apache/Nginx + PHP-FPM), `public/.user.ini` s'applique
+> automatiquement.
+>
+> `bin/serve` est un script `sh` (Linux/macOS). Il traduit aussi les arrêts volontaires du serveur
+> — Ctrl+C (130) ou SIGTERM (143) — en code de sortie 0 : sans ça, Composer signalait chaque arrêt
+> comme une erreur (« returned with error code 143 »). Les vraies erreurs remontent normalement.
 
 ### Passer sur MySQL
 
@@ -45,13 +52,13 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 ## Mise en production — checklist
 
 1. `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`
-2. **Changer `ADMIN_DEFAULT_PASSWORD`** avant le premier seed (ou changer le mot de passe admin ensuite)
+2. **Laisser `ADMIN_DEFAULT_PASSWORD` vide** : le seeder génère alors un mot de passe aléatoire affiché une seule fois. Ne jamais committer de mot de passe dans `.env.example`
 3. MySQL configuré (voir ci-dessus) — les données de démonstration ne sont pas seedées en production
-4. SMTP réel (`MAIL_*`) pour les emails de commande
+4. SMTP réel (`MAIL_*`) pour les emails de commande **et de vérification d'adresse** — sans SMTP fonctionnel, les clients ne peuvent pas vérifier leur email, et les commandes passées en invité ne leur sont jamais rattachées
 5. Worker de queue : `php artisan queue:work` (superviser avec Supervisor/systemd)
 6. Clés PayDunya (`PAYDUNYA_*`, `PAYDUNYA_MODE=live`) — le paiement en ligne s'active automatiquement dès qu'elles sont renseignées ; déclarer l'IPN `https://votre-domaine/webhooks/paydunya`
 7. Optimisations : `php artisan config:cache route:cache view:cache event:cache` et `npm run build`
-8. HTTPS obligatoire (forcé automatiquement en production) + certificat + décommenter `SESSION_SECURE_COOKIE=true` dans `.env`
+8. HTTPS obligatoire (forcé automatiquement en production) + certificat — le cookie de session passe en `Secure` automatiquement dès `APP_ENV=production`
 9. Sauvegardes régulières : base de données + `storage/app/public` (images)
 10. Vérifier `https://votre-domaine/sitemap.xml` et soumettre à Google Search Console
 

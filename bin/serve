@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+#
+# Serveur de développement de la boutique.
+#
+# Les limites d'upload sont passées en -d parce que le serveur intégré de PHP
+# (celui qu'utilise `artisan serve`) ignore public/.user.ini : sans elles,
+# l'envoi d'une image produit échoue silencieusement au-delà d'environ 2 Mo.
+#
+# Arrêter le serveur — Ctrl+C, ou un « stop » depuis l'IDE — fait sortir PHP
+# avec 130 (SIGINT) ou 143 (SIGTERM). Composer considère tout code non nul
+# comme un échec et affiche alors :
+#
+#   Script php -d upload_max_filesize=10M … returned with error code 143
+#
+# Ces deux codes correspondent à un arrêt volontaire : on les normalise en
+# succès. Les vraies erreurs (port déjà occupé, autoload cassé…) continuent
+# de remonter avec leur code d'origine.
+
+# Le signal est délivré à tout le groupe de processus : le trap couvre le cas
+# où le shell le reçoit lui-même, le `case` celui où seul PHP est visé.
+trap 'exit 0' INT TERM
+
+php -d upload_max_filesize=10M \
+    -d post_max_size=40M \
+    -d memory_limit=256M \
+    artisan serve "$@"
+
+code=$?
+
+case "$code" in
+    130 | 143) exit 0 ;;
+    *) exit "$code" ;;
+esac
