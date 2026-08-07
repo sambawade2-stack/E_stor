@@ -25,12 +25,11 @@
             </a>
         </div>
 
-        @guest
-            <p class="mt-8 text-center text-xs text-gray-400">
-                <a href="{{ route('register') }}" class="underline hover:text-gray-600">Créez un compte</a>
-                avec l'email {{ $order->customer_email ?: 'utilisé' }} pour suivre vos prochaines commandes.
-            </p>
-        @endguest
+        <p class="mt-8 text-center text-sm text-gray-500">
+            Notez votre numéro <strong class="text-gray-900">{{ $order->order_number }}</strong> :
+            il vous permet de <a href="{{ route('shop.order.track') }}" class="font-semibold text-primary-600 underline">suivre votre commande</a>
+            à tout moment, sans compte.
+        </p>
     </div>
 
 </x-shop-layout>

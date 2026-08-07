@@ -26,9 +26,8 @@
 
                     @guest
                         <p class="mb-5 rounded-xl bg-primary-50 px-4 py-3 text-sm text-primary-700">
-                            Vous avez déjà un compte ?
-                            <a href="{{ route('login') }}" class="font-semibold underline">Connectez-vous</a>
-                            pour suivre vos commandes — ou continuez en tant qu'invité.
+                            Aucun compte n'est nécessaire. Renseignez simplement vos coordonnées de livraison —
+                            vous pourrez suivre votre commande avec son numéro et votre téléphone.
                         </p>
                     @endguest
 

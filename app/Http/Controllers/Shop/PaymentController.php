@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\Orders\GuestOrderAccess;
 use App\Services\Payments\PaymentConfirmationService;
 use Illuminate\Http\RedirectResponse;
 
@@ -13,12 +14,9 @@ class PaymentController extends Controller
     /**
      * Retour du client depuis la page de paiement du fournisseur.
      */
-    public function return(Order $order, PaymentConfirmationService $confirmation): RedirectResponse
+    public function return(Order $order, PaymentConfirmationService $confirmation, GuestOrderAccess $access): RedirectResponse
     {
-        $canView = session('last_order_number') === $order->order_number
-            || (auth()->check() && $order->user_id === auth()->id());
-
-        abort_unless($canView, 404);
+        abort_unless($access->allows($order), 404);
 
         $payment = $order->payments()->whereNotNull('checkout_token')->latest()->first();
 

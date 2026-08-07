@@ -36,6 +36,7 @@
                 <ul class="mt-4 space-y-2.5 text-sm">
                     <li><a href="{{ route('shop.catalog') }}" class="transition hover:text-primary-400">Catalogue</a></li>
                     <li><a href="{{ route('shop.promotions') }}" class="transition hover:text-primary-400">Promotions</a></li>
+                    <li><a href="{{ route('shop.order.track') }}" class="transition hover:text-primary-400">Suivre ma commande</a></li>
                     <li><a href="{{ route('shop.about') }}" class="transition hover:text-primary-400">À propos</a></li>
                     <li><a href="{{ route('shop.contact') }}" class="transition hover:text-primary-400">Contact</a></li>
                     <li><a href="{{ route('shop.terms') }}" class="transition hover:text-primary-400">Conditions générales</a></li>

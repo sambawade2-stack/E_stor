@@ -106,6 +106,33 @@ class Order extends Model
     }
 
     /**
+     * Le numéro fourni correspond-il au téléphone de la commande ?
+     *
+     * Sert de preuve légère sur la page de suivi public : le client saisit
+     * son numéro comme il veut (+221 77 123 45 67, 771234567…), on compare
+     * sur les 9 chiffres significatifs — un numéro sénégalais — pour tolérer
+     * l'indicatif présent d'un seul côté. Comparaison à temps constant :
+     * c'est un contrôle d'accès, même s'il est faible.
+     */
+    public function matchesPhone(?string $phone): bool
+    {
+        $digits = fn (?string $value) => preg_replace('/\D/', '', (string) $value);
+
+        $given = $digits($phone);
+        $stored = $digits($this->customer_phone);
+
+        if ($given === '' || $stored === '') {
+            return false;
+        }
+
+        if (strlen($given) >= 9 && strlen($stored) >= 9) {
+            return hash_equals(substr($stored, -9), substr($given, -9));
+        }
+
+        return hash_equals($stored, $given);
+    }
+
+    /**
      * Génère un numéro de commande unique, ex. ES-20260731-A1B2C3.
      */
     public static function generateOrderNumber(): string

@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use App\Services\Checkout\CheckoutService;
+use App\Services\Orders\GuestOrderAccess;
 use App\Services\Payments\PaymentManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,7 @@ class CheckoutController extends Controller
     public function __construct(
         private readonly CartService $cart,
         private readonly PaymentManager $payments,
+        private readonly GuestOrderAccess $guestAccess,
     ) {
     }
 
@@ -55,7 +57,7 @@ class CheckoutController extends Controller
             return back()->withErrors(['payment' => 'Ce moyen de paiement n\'est pas disponible.'])->withInput();
         }
 
-        $zone = ShippingZone::findOrFail($validated['shipping_zone_id']);
+        $zone = ShippingZone::active()->findOrFail($validated['shipping_zone_id']);
         $this->cart->setShippingZone($zone);
 
         try {
@@ -76,7 +78,7 @@ class CheckoutController extends Controller
         }
 
         // Autorise l'invité à consulter sa confirmation (et le retour paiement)
-        session()->put('last_order_number', $order->order_number);
+        $this->guestAccess->grant($order);
 
         return $this->initiatePayment($order, $provider);
     }
@@ -118,10 +120,7 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order): View
     {
-        $canView = session('last_order_number') === $order->order_number
-            || (auth()->check() && $order->user_id === auth()->id());
-
-        abort_unless($canView, 404);
+        abort_unless($this->guestAccess->allows($order), 404);
 
         $order->load('items');
 

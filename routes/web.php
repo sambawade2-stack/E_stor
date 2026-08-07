@@ -19,6 +19,7 @@ use App\Http\Controllers\Shop\CatalogController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\HomeController;
 use App\Http\Controllers\Shop\NewsletterController;
+use App\Http\Controllers\Shop\OrderTrackingController;
 use App\Http\Controllers\Shop\PageController;
 use App\Http\Controllers\Shop\PaymentController;
 use App\Http\Controllers\Shop\ProductController;
@@ -61,6 +62,14 @@ Route::name('shop.')->group(function () {
     Route::post('/commander', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');
     Route::get('/commande/confirmation/{order:order_number}', [CheckoutController::class, 'confirmation'])->name('order.confirmation');
     Route::get('/paiement/retour/{order:order_number}', [PaymentController::class, 'return'])->name('payment.return');
+
+    // Suivi sans compte : numéro de commande + téléphone. Le throttle
+    // empêche de balayer les numéros de commande pour trouver une paire valide.
+    Route::get('/suivi', [OrderTrackingController::class, 'show'])->name('order.track');
+    Route::post('/suivi', [OrderTrackingController::class, 'find'])
+        ->middleware('throttle:10,1')
+        ->name('order.track.find');
+    Route::get('/suivi/{order:order_number}', [OrderTrackingController::class, 'result'])->name('order.track.show');
 
     Route::post('/newsletter', [NewsletterController::class, 'store'])
         ->middleware('throttle:10,1')
