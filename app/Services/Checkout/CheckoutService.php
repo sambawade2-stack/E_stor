@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentProvider;
 use App\Enums\PaymentStatus;
 use App\Events\OrderPlaced;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -45,6 +46,13 @@ class CheckoutService
                 ->get()
                 ->keyBy('id');
 
+            // Idem pour le coupon : sans relecture sous verrou, deux commandes
+            // simultanées lisent le même used_count, passent toutes deux la
+            // validation et dépassent max_uses.
+            if ($coupon !== null) {
+                $coupon = Coupon::whereKey($coupon->getKey())->lockForUpdate()->first();
+            }
+
             $subtotal = 0.0;
             $lines = [];
 
@@ -66,6 +74,12 @@ class CheckoutService
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                 ];
+            }
+
+            // Revalidation sous verrou : le quota a pu être épuisé, ou le
+            // coupon désactivé/expiré, depuis son application au panier.
+            if ($coupon !== null && ! $coupon->isValidFor($subtotal)) {
+                $coupon = null;
             }
 
             $discount = $coupon?->discountFor($subtotal) ?? 0.0;

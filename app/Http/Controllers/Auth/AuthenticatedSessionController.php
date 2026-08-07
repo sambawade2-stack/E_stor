@@ -29,8 +29,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Rattache les éventuelles commandes passées en invité avec cet email
-        Order::claimFor($request->user());
+        // Rattache les éventuelles commandes passées en invité avec cet email,
+        // uniquement si l'adresse a été vérifiée : elle sert de preuve de
+        // propriété sur des données personnelles (adresse, téléphone).
+        if ($request->user()->hasVerifiedEmail()) {
+            Order::claimFor($request->user());
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

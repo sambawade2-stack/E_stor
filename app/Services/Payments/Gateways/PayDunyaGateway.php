@@ -90,10 +90,13 @@ class PayDunyaGateway implements PaymentGateway
             default => PaymentStatus::Pending,
         };
 
+        $amount = $data['invoice']['total_amount'] ?? $data['total_amount'] ?? null;
+
         return new PaymentVerification(
             status: $status,
             reference: $data['receipt_url'] ?? $data['invoice']['token'] ?? $token,
             payload: $data,
+            amount: is_numeric($amount) ? (float) $amount : null,
         );
     }
 

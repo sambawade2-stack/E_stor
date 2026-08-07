@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -47,9 +46,9 @@ class RegisteredUserController extends Controller
 
         $user->assignRole('customer');
 
-        // Rattache les commandes passées en invité avec cet email
-        Order::claimFor($user);
-
+        // Les commandes invité ne sont PAS rattachées ici : l'email n'est pas
+        // encore prouvé. Le rattachement a lieu après vérification, dans
+        // VerifyEmailController.
         event(new Registered($user));
 
         Auth::login($user);

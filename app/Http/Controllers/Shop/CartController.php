@@ -9,6 +9,7 @@ use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CartController extends Controller
@@ -104,10 +105,14 @@ class CartController extends Controller
     public function setShippingZone(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'shipping_zone_id' => ['required', 'integer', 'exists:shipping_zones,id'],
+            'shipping_zone_id' => [
+                'required',
+                'integer',
+                Rule::exists('shipping_zones', 'id')->where('is_active', true),
+            ],
         ]);
 
-        $this->cart->setShippingZone(ShippingZone::findOrFail($validated['shipping_zone_id']));
+        $this->cart->setShippingZone(ShippingZone::active()->findOrFail($validated['shipping_zone_id']));
 
         return back();
     }

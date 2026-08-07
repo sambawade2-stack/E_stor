@@ -20,8 +20,38 @@ class CartService
 
     private const SHIPPING_KEY = 'cart.shipping_zone';
 
+    /**
+     * Caches par requête. items(), coupon() et shippingZone() s'appellent en
+     * cascade (total → subtotal → items, discount → coupon → subtotal → items…) :
+     * sans mémoïsation, l'affichage du panier rejouait une dizaine de fois
+     * les mêmes SELECT.
+     *
+     * @var Collection<int, array{product: Product, quantity: int, line_total: float}>|null
+     */
+    private ?Collection $itemsCache = null;
+
+    private bool $couponResolved = false;
+
+    private ?Coupon $couponCache = null;
+
+    private bool $zoneResolved = false;
+
+    private ?ShippingZone $zoneCache = null;
+
     public function __construct(private readonly Session $session)
     {
+    }
+
+    /**
+     * Invalide les caches après toute modification du panier.
+     */
+    private function flushCache(): void
+    {
+        $this->itemsCache = null;
+        $this->couponResolved = false;
+        $this->couponCache = null;
+        $this->zoneResolved = false;
+        $this->zoneCache = null;
     }
 
     /* ----------------------------------------------------------------- */
@@ -30,36 +60,46 @@ class CartService
 
     /**
      * Lignes du panier avec leurs produits chargés.
-     * Les produits supprimés ou désactivés sont retirés silencieusement.
+     * Les produits supprimés, désactivés ou en rupture sont retirés
+     * silencieusement : les laisser bloquerait définitivement la commande,
+     * CheckoutService refusant toute ligne dont le stock est insuffisant.
      *
      * @return Collection<int, array{product: Product, quantity: int, line_total: float}>
      */
     public function items(): Collection
     {
+        if ($this->itemsCache !== null) {
+            return $this->itemsCache;
+        }
+
         $stored = $this->storedItems();
 
         if ($stored === []) {
-            return collect();
+            return $this->itemsCache = collect();
         }
 
         $products = Product::active()
+            ->inStock()
             ->with(['primaryImage', 'category:id,name,slug'])
             ->findMany(array_keys($stored));
 
-        // Purge les identifiants qui ne correspondent plus à un produit actif
-        $this->session->put(self::ITEMS_KEY, $products->pluck('id')
-            ->mapWithKeys(fn ($id) => [$id => $stored[$id]])
-            ->all());
+        // Purge les identifiants qui ne correspondent plus à un produit
+        // commandable, et cale les quantités sur le stock réellement dispo.
+        $kept = $products
+            ->mapWithKeys(fn (Product $product) => [
+                $product->id => min($stored[$product->id], $product->stock_quantity),
+            ])
+            ->all();
 
-        return $products->map(function (Product $product) use ($stored) {
-            $quantity = min($stored[$product->id], max($product->stock_quantity, 1));
+        if ($kept !== $stored) {
+            $this->session->put(self::ITEMS_KEY, $kept);
+        }
 
-            return [
-                'product' => $product,
-                'quantity' => $quantity,
-                'line_total' => $product->current_price * $quantity,
-            ];
-        })->values();
+        return $this->itemsCache = $products->map(fn (Product $product) => [
+            'product' => $product,
+            'quantity' => $kept[$product->id],
+            'line_total' => $product->current_price * $kept[$product->id],
+        ])->values();
     }
 
     public function add(Product $product, int $quantity = 1): void
@@ -70,6 +110,7 @@ class CartService
         $items[$product->id] = min($quantity, $product->stock_quantity);
 
         $this->session->put(self::ITEMS_KEY, $items);
+        $this->flushCache();
     }
 
     public function update(Product $product, int $quantity): void
@@ -84,6 +125,7 @@ class CartService
         $items[$product->id] = min($quantity, $product->stock_quantity);
 
         $this->session->put(self::ITEMS_KEY, $items);
+        $this->flushCache();
     }
 
     public function remove(Product $product): void
@@ -92,16 +134,23 @@ class CartService
         unset($items[$product->id]);
 
         $this->session->put(self::ITEMS_KEY, $items);
+        $this->flushCache();
     }
 
     public function clear(): void
     {
-        $this->session->forget(['cart.items', 'cart.coupon', 'cart.shipping_zone']);
+        $this->session->forget([self::ITEMS_KEY, self::COUPON_KEY, self::SHIPPING_KEY]);
+        $this->flushCache();
     }
 
+    /**
+     * Nombre d'articles réellement commandables (badge du header).
+     * Basé sur items() et non sur la session brute, pour ne pas afficher un
+     * compteur incluant des produits retirés ou en rupture.
+     */
     public function count(): int
     {
-        return array_sum($this->storedItems());
+        return (int) $this->items()->sum('quantity');
     }
 
     public function isEmpty(): bool
@@ -116,11 +165,13 @@ class CartService
     public function applyCoupon(Coupon $coupon): void
     {
         $this->session->put(self::COUPON_KEY, $coupon->code);
+        $this->flushCache();
     }
 
     public function removeCoupon(): void
     {
         $this->session->forget(self::COUPON_KEY);
+        $this->flushCache();
     }
 
     /**
@@ -128,21 +179,28 @@ class CartService
      */
     public function coupon(): ?Coupon
     {
+        if ($this->couponResolved) {
+            return $this->couponCache;
+        }
+
         $code = $this->session->get(self::COUPON_KEY);
 
         if ($code === null) {
-            return null;
+            $this->couponResolved = true;
+
+            return $this->couponCache = null;
         }
 
         $coupon = Coupon::where('code', $code)->first();
 
         if ($coupon === null || ! $coupon->isValidFor($this->subtotal())) {
-            $this->removeCoupon();
-
-            return null;
+            $this->session->forget(self::COUPON_KEY);
+            $coupon = null;
         }
 
-        return $coupon;
+        $this->couponResolved = true;
+
+        return $this->couponCache = $coupon;
     }
 
     /* ----------------------------------------------------------------- */
@@ -152,13 +210,19 @@ class CartService
     public function setShippingZone(ShippingZone $zone): void
     {
         $this->session->put(self::SHIPPING_KEY, $zone->id);
+        $this->flushCache();
     }
 
     public function shippingZone(): ?ShippingZone
     {
-        $id = $this->session->get(self::SHIPPING_KEY);
+        if ($this->zoneResolved) {
+            return $this->zoneCache;
+        }
 
-        return $id ? ShippingZone::active()->find($id) : null;
+        $id = $this->session->get(self::SHIPPING_KEY);
+        $this->zoneResolved = true;
+
+        return $this->zoneCache = $id ? ShippingZone::active()->find($id) : null;
     }
 
     /* ----------------------------------------------------------------- */

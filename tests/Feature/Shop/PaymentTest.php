@@ -185,6 +185,68 @@ class PaymentTest extends TestCase
         $this->assertSame(OrderStatus::Paid, $order->fresh()->status);
     }
 
+    /**
+     * Un « completed » annoncé pour un montant inférieur au total ne doit
+     * jamais solder la commande : le fournisseur peut renvoyer une facture
+     * réglée partiellement ou modifiée.
+     */
+    public function test_a_payment_for_the_wrong_amount_does_not_settle_the_order(): void
+    {
+        $this->configurePayDunya();
+
+        Http::fake([
+            '*/checkout-invoice/create' => Http::response([
+                'response_code' => '00',
+                'response_text' => 'https://paydunya.com/checkout/invoice/tok_123',
+                'token' => 'tok_123',
+            ]),
+            '*/checkout-invoice/confirm/*' => Http::response([
+                'status' => 'completed',
+                'invoice' => ['total_amount' => 100], // au lieu de 12 000
+            ]),
+        ]);
+
+        $this->checkout('paydunya');
+
+        $this->flushSession();
+        $this->post(route('webhooks.paydunya'), [
+            'data' => ['invoice' => ['token' => 'tok_123']],
+        ])->assertNoContent();
+
+        $order = Order::firstOrFail();
+
+        $this->assertSame(PaymentStatus::Pending, Payment::firstOrFail()->status);
+        $this->assertSame(OrderStatus::Pending, $order->status);
+        $this->assertNull($order->paid_at);
+    }
+
+    public function test_a_payment_for_the_expected_amount_settles_the_order(): void
+    {
+        $this->configurePayDunya();
+
+        Http::fake([
+            '*/checkout-invoice/create' => Http::response([
+                'response_code' => '00',
+                'response_text' => 'https://paydunya.com/checkout/invoice/tok_123',
+                'token' => 'tok_123',
+            ]),
+            '*/checkout-invoice/confirm/*' => Http::response([
+                'status' => 'completed',
+                'invoice' => ['total_amount' => 12000], // 10 000 + 2 000 de port
+            ]),
+        ]);
+
+        $this->checkout('paydunya');
+
+        $this->flushSession();
+        $this->post(route('webhooks.paydunya'), [
+            'data' => ['invoice' => ['token' => 'tok_123']],
+        ])->assertNoContent();
+
+        $this->assertSame(PaymentStatus::Paid, Payment::firstOrFail()->status);
+        $this->assertSame(OrderStatus::Paid, Order::firstOrFail()->status);
+    }
+
     public function test_cash_on_delivery_still_goes_straight_to_confirmation(): void
     {
         $this->checkout('cash_on_delivery');

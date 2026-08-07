@@ -4,8 +4,11 @@ namespace Tests\Feature\Security;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -48,7 +51,7 @@ class SecurityHardeningTest extends TestCase
      */
     public function test_home_json_ld_escapes_script_breakout_attempts(): void
     {
-        \App\Models\Setting::set('shop_name', 'ES</script><script>alert(1)</script>');
+        Setting::set('shop_name', 'ES</script><script>alert(1)</script>');
 
         $html = $this->get(route('shop.home'))->getContent();
 
@@ -119,6 +122,63 @@ class SecurityHardeningTest extends TestCase
         $customer->assignRole('customer');
 
         $this->actingAs($customer)->get(route('admin.dashboard'))->assertForbidden();
+    }
+
+    /**
+     * Le SVG n'est pas décodable par le driver GD (erreur 500 à l'upload) et
+     * serait, s'il était stocké tel quel, un vecteur de XSS stocké.
+     */
+    public function test_an_svg_logo_is_rejected(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::firstOrCreate(['name' => 'admin']));
+        Permission::firstOrCreate(['name' => 'manage settings']);
+        $admin->givePermissionTo('manage settings');
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
+            .'<script>alert(document.cookie)</script></svg>';
+
+        $this->actingAs($admin)
+            ->patch(route('admin.settings.update'), [
+                'shop_name' => 'ES',
+                'shop_email' => 'contact@es.test',
+                'shop_phone' => '770000000',
+                'whatsapp_number' => '221770000000',
+                'currency_symbol' => 'FCFA',
+                'logo' => UploadedFile::fake()->createWithContent('logo.svg', $svg),
+            ])
+            ->assertSessionHasErrors('logo');
+
+        $this->assertNull(Setting::get('logo_path'));
+    }
+
+    /**
+     * Sans le flag Secure, le cookie de session part en clair sur une
+     * première requête HTTP et peut être intercepté.
+     */
+    public function test_the_session_cookie_is_secure_in_production(): void
+    {
+        $original = $_SERVER['APP_ENV'] ?? null;
+
+        try {
+            $_SERVER['APP_ENV'] = 'production';
+            $this->assertTrue(
+                (require base_path('config/session.php'))['secure'],
+                'Le flag Secure doit être actif par défaut en production.'
+            );
+
+            $_SERVER['APP_ENV'] = 'local';
+            $this->assertFalse(
+                (require base_path('config/session.php'))['secure'],
+                'En local (HTTP), forcer Secure empêcherait toute session.'
+            );
+        } finally {
+            if ($original === null) {
+                unset($_SERVER['APP_ENV']);
+            } else {
+                $_SERVER['APP_ENV'] = $original;
+            }
+        }
     }
 
     /**

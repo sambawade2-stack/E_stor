@@ -27,8 +27,12 @@ class SettingsRequest extends FormRequest
             'facebook_url' => ['nullable', 'url', 'max:255'],
             'instagram_url' => ['nullable', 'url', 'max:255'],
             'tiktok_url' => ['nullable', 'url', 'max:255'],
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:4096'],
-            'favicon' => ['nullable', 'image', 'mimes:png,ico,webp', 'max:512'],
+            // Uniquement des formats matriciels : ImageService réencode via
+            // le driver GD, qui ne sait décoder ni le SVG ni l'ICO (l'upload
+            // partait en erreur 500). Un SVG stocké tel quel serait par
+            // ailleurs un vecteur de XSS stocké.
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'favicon' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:512'],
         ];
     }
 

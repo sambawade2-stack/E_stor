@@ -15,7 +15,10 @@ return [
 
     'admin_email' => env('SHOP_ADMIN_EMAIL', 'admin@electroniques-stores.com'),
 
-    'admin_default_password' => env('ADMIN_DEFAULT_PASSWORD', 'ChangeMe!2026'),
+    // Volontairement sans valeur par défaut : si rien n'est fourni,
+    // AdminUserSeeder génère un mot de passe aléatoire plutôt que d'en
+    // réutiliser un connu de tous.
+    'admin_default_password' => env('ADMIN_DEFAULT_PASSWORD'),
 
     'currency' => env('SHOP_CURRENCY', 'XOF'),
 

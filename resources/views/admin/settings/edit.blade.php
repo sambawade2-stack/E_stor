@@ -78,18 +78,18 @@
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">Logo</label>
                     @if (! empty($settings['logo_path']))
-                        <img src="{{ Storage::url($settings['logo_path']) }}" alt="Logo actuel" class="mb-3 h-14 w-auto rounded-lg border border-gray-100 bg-gray-50 p-1.5">
+                        <img src="{{ Storage::disk('public')->url($settings['logo_path']) }}" alt="Logo actuel" class="mb-3 h-14 w-auto rounded-lg border border-gray-100 bg-gray-50 p-1.5">
                     @endif
-                    <input type="file" name="logo" accept="image/*"
+                    <input type="file" name="logo" accept="image/jpeg,image/png,image/webp"
                            class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-600 hover:file:bg-primary-100">
                     @error('logo')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">Favicon</label>
                     @if (! empty($settings['favicon_path']))
-                        <img src="{{ Storage::url($settings['favicon_path']) }}" alt="Favicon actuel" class="mb-3 h-10 w-10 rounded-lg border border-gray-100 bg-gray-50 p-1">
+                        <img src="{{ Storage::disk('public')->url($settings['favicon_path']) }}" alt="Favicon actuel" class="mb-3 h-10 w-10 rounded-lg border border-gray-100 bg-gray-50 p-1">
                     @endif
-                    <input type="file" name="favicon" accept="image/png,image/webp,image/x-icon"
+                    <input type="file" name="favicon" accept="image/png,image/jpeg,image/webp"
                            class="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-600 hover:file:bg-primary-100">
                     @error('favicon')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
                 </div>

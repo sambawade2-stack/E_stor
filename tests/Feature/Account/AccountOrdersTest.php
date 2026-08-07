@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -83,7 +84,13 @@ class AccountOrdersTest extends TestCase
             ->assertSee('24 000'); // total dépensé hors commandes annulées
     }
 
-    public function test_guest_orders_are_claimed_at_registration(): void
+    /**
+     * L'inscription seule ne prouve pas la propriété de l'adresse email :
+     * tant qu'elle n'est pas vérifiée, les commandes invité ne doivent pas
+     * être rattachées (sinon n'importe qui s'inscrit avec l'email d'un
+     * client et récupère son adresse, son téléphone et son historique).
+     */
+    public function test_guest_orders_are_not_claimed_before_the_email_is_verified(): void
     {
         $order = $this->makeOrder(['customer_email' => 'awa@example.com']);
 
@@ -98,7 +105,52 @@ class AccountOrdersTest extends TestCase
         $user = User::where('email', 'awa@example.com')->firstOrFail();
 
         $this->assertTrue($user->hasRole('customer'));
+        $this->assertFalse($user->hasVerifiedEmail());
+        $this->assertNull($order->fresh()->user_id);
+
+        // La commande reste inaccessible depuis le compte non vérifié
+        $this->actingAs($user)
+            ->get(route('account.orders.show', $order))
+            ->assertNotFound();
+    }
+
+    public function test_guest_orders_are_claimed_once_the_email_is_verified(): void
+    {
+        $order = $this->makeOrder(['customer_email' => 'awa@example.com']);
+
+        $this->post(route('register'), [
+            'name' => 'Awa Ndiaye',
+            'email' => 'awa@example.com',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
+        ]);
+
+        $user = User::where('email', 'awa@example.com')->firstOrFail();
+
+        $this->actingAs($user)->get(URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        ));
+
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
         $this->assertSame($user->id, $order->fresh()->user_id);
+    }
+
+    public function test_guest_orders_are_not_claimed_at_login_when_unverified(): void
+    {
+        User::factory()->unverified()->create([
+            'email' => 'pending@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $order = $this->makeOrder(['customer_email' => 'pending@example.com']);
+
+        $this->post(route('login'), [
+            'email' => 'pending@example.com',
+            'password' => 'password',
+        ]);
+
+        $this->assertNull($order->fresh()->user_id);
     }
 
     public function test_guest_orders_are_claimed_at_login(): void
