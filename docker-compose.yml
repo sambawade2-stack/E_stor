@@ -1,0 +1,192 @@
+# Pile complète pour Dokploy : application, worker de queue et base.
+#
+# Dans Dokploy, créez un service de type « Compose », pointez-le sur ce dépôt
+# puis attachez votre domaine au service « app » sur le port 80. Traefik se
+# charge du HTTPS ; c'est lui que TRUSTED_PROXIES autorise (cf. bootstrap/app.php).
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      # Renseignées depuis l'onglet « Environment » de Dokploy.
+      APP_NAME: "${APP_NAME:-Électroniques Stores}"
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: "${APP_KEY:?APP_KEY est obligatoire — php artisan key:generate --show}"
+      APP_URL: "${APP_URL:?APP_URL est obligatoire — ex. https://boutique.exemple.com}"
+
+      # Les journaux partent sur la sortie du conteneur : ils deviennent
+      # consultables dans Dokploy, et rien ne s'accumule sur le disque.
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: "${LOG_LEVEL:-warning}"
+
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: "${DB_DATABASE:-electroniques}"
+      DB_USERNAME: "${DB_USERNAME:-electroniques}"
+      DB_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD est obligatoire}"
+
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+
+      MAIL_MAILER: "${MAIL_MAILER:-smtp}"
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_SCHEME: "${MAIL_SCHEME:-tls}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-no-reply@localhost}"
+      MAIL_FROM_NAME: "${APP_NAME:-Électroniques Stores}"
+
+      PAYDUNYA_MASTER_KEY: "${PAYDUNYA_MASTER_KEY:-}"
+      PAYDUNYA_PRIVATE_KEY: "${PAYDUNYA_PRIVATE_KEY:-}"
+      PAYDUNYA_TOKEN: "${PAYDUNYA_TOKEN:-}"
+      PAYDUNYA_MODE: "${PAYDUNYA_MODE:-live}"
+
+      SHOP_ADMIN_EMAIL: "${SHOP_ADMIN_EMAIL:-}"
+    volumes:
+      # Seul le contenu téléversé doit survivre au redéploiement. Sans ce
+      # volume, toutes les photos produits disparaîtraient à chaque mise
+      # en ligne : l'image est reconstruite de zéro.
+      - storage:/var/www/html/storage/app/public
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          # Plafonne l'application pour qu'une pointe de trafic ou une
+          # boucle imprévue ne rende pas le serveur entier injoignable :
+          # sans limite, un conteneur peut affamer les deux autres.
+          cpus: "${APP_CPUS:-1.0}"
+          memory: "${APP_MEMORY:-768M}"
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Sans ce service, AUCUN email ne part : les notifications de commande
+    # sont asynchrones (ShouldQueue) et resteraient empilées en base.
+    command:
+      - php
+      - artisan
+      - queue:work
+      - --queue=default
+      - --sleep=3
+      - --tries=3
+      - --max-time=3600
+      - --backoff=10
+    environment:
+      # Les migrations sont menées par « app » : le worker ne doit pas les
+      # lancer en parallèle, deux migrations simultanées se marcheraient dessus.
+      RUN_MIGRATIONS: "false"
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: "${APP_KEY:?}"
+      APP_URL: "${APP_URL:?}"
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: "${LOG_LEVEL:-warning}"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: "${DB_DATABASE:-electroniques}"
+      DB_USERNAME: "${DB_USERNAME:-electroniques}"
+      DB_PASSWORD: "${DB_PASSWORD:?}"
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      MAIL_MAILER: "${MAIL_MAILER:-smtp}"
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_SCHEME: "${MAIL_SCHEME:-tls}"
+      MAIL_FROM_ADDRESS: "${MAIL_FROM_ADDRESS:-no-reply@localhost}"
+      MAIL_FROM_NAME: "${APP_NAME:-Électroniques Stores}"
+      SHOP_ADMIN_EMAIL: "${SHOP_ADMIN_EMAIL:-}"
+    volumes:
+      - storage:/var/www/html/storage/app/public
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          # Le worker traite les emails un par un : il n'a pas besoin de
+          # beaucoup, et le brider garantit qu'un envoi lent ne ralentit
+          # jamais l'affichage du site.
+          cpus: "${WORKER_CPUS:-0.5}"
+          memory: "${WORKER_MEMORY:-384M}"
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    # Réglage pour petit VPS : le tampon InnoDB par défaut réserve à lui
+    # seul plusieurs centaines de mégaoctets.
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+      - --performance-schema=OFF
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-electroniques}"
+      MYSQL_USER: "${DB_USERNAME:-electroniques}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:?}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD est obligatoire}"
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      # On interroge la base AVEC le compte applicatif, et non un simple
+      # « ping » root : pendant son initialisation, MySQL démarre un serveur
+      # temporaire qui répond déjà sur 127.0.0.1 alors que le compte et la
+      # base n'existent pas encore. Le service passait donc « healthy » trop
+      # tôt, et l'application repartait en boucle faute de pouvoir se
+      # connecter. Ce test n'aboutit qu'une fois l'initialisation terminée.
+      test:
+        - CMD
+        - mysql
+        - -h127.0.0.1
+        - -u${DB_USERNAME:-electroniques}
+        - -p${DB_PASSWORD}
+        - -D${DB_DATABASE:-electroniques}
+        - -e
+        - SELECT 1
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "${DB_CPUS:-0.75}"
+          memory: "${DB_MEMORY:-512M}"
+        reservations:
+          cpus: "0.15"
+          memory: 256M
+
+volumes:
+  storage:
+  mysql:
+
+networks:
+  internal:

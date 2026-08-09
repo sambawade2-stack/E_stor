@@ -1,8 +1,11 @@
 *.log
 .DS_Store
+# Toutes les variantes d'environnement, sauf le modèle : une liste de noms
+# précis laissait passer un .env.docker-test ou un .env.local, avec les
+# secrets qu'il contient.
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
 .phpactor.json
 .phpunit.result.cache
 /.fleet

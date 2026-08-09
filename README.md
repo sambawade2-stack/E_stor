@@ -51,6 +51,10 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 
 ## Mise en production — checklist
 
+> Pour un déploiement conteneurisé (Dokploy, ou tout hôte Docker), voir
+> **Déploiement avec Dokploy** plus bas : les points 1, 5, 7 et 8 y sont
+> automatisés par l'image.
+
 1. `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`
 2. **Laisser `ADMIN_DEFAULT_PASSWORD` vide** : le seeder génère alors un mot de passe aléatoire affiché une seule fois. Ne jamais committer de mot de passe dans `.env.example`
 3. MySQL configuré (voir ci-dessus) — les données de démonstration ne sont pas seedées en production
@@ -61,6 +65,88 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 8. HTTPS obligatoire (forcé automatiquement en production) + certificat — le cookie de session passe en `Secure` automatiquement dès `APP_ENV=production`
 9. Sauvegardes régulières : base de données + `storage/app/public` (images)
 10. Vérifier `https://votre-domaine/sitemap.xml` et soumettre à Google Search Console
+
+## Déploiement avec Dokploy
+
+L'application est conteneurisée : `Dockerfile` (nginx + PHP-FPM 8.3) et
+`docker-compose.yml` (application, worker de queue, MySQL). Node et Composer
+ne servent qu'à la construction et n'existent pas dans l'image finale (~214 Mo).
+
+### 1. Générer la clé d'application
+
+```bash
+php artisan key:generate --show
+```
+
+Le conteneur refuse de démarrer si `APP_KEY` est vide, plutôt que de servir
+un site dont les sessions et les données chiffrées seraient illisibles.
+
+### 2. Créer le service dans Dokploy
+
+Type **Compose**, pointé sur ce dépôt. Attachez ensuite votre domaine au
+service `app` sur le port **80** : Traefik s'occupe du certificat HTTPS.
+
+### 3. Variables d'environnement
+
+Obligatoires — le déploiement échoue explicitement si elles manquent :
+
+| Variable | Exemple |
+|---|---|
+| `APP_KEY` | `base64:…` (étape 1) |
+| `APP_URL` | `https://boutique.exemple.com` |
+| `DB_PASSWORD` | mot de passe applicatif |
+| `DB_ROOT_PASSWORD` | mot de passe root MySQL |
+
+Recommandées : `MAIL_*` (sans SMTP, aucun email ne part), `SHOP_ADMIN_EMAIL`,
+et `PAYDUNYA_*` pour activer le paiement en ligne.
+
+### 4. Après le premier déploiement
+
+```bash
+# Rôles, permissions et compte administrateur
+docker compose exec app php artisan db:seed --class=RoleAndPermissionSeeder
+docker compose exec app php artisan db:seed --class=AdminUserSeeder
+```
+
+Le mot de passe administrateur généré n'est affiché qu'une fois : notez-le.
+
+Déclarez enfin l'IPN PayDunya sur `https://votre-domaine/webhooks/paydunya`.
+
+### Ce que le conteneur fait tout seul
+
+Au démarrage : attente de la base, `storage:link`, migrations (`--force`),
+puis mise en cache de la configuration, des routes, des vues et des
+événements. Ces caches sont construits **à l'exécution** et non à la
+construction de l'image — les figer au build embarquerait les valeurs du
+moment et l'application déployée pointerait vers la mauvaise base.
+
+### Ressources
+
+Chaque service est plafonné pour qu'aucun ne puisse asphyxier les autres :
+
+| Service | Processeur | Mémoire |
+|---|---|---|
+| `app` | 1.0 | 768 Mo |
+| `worker` | 0.5 | 384 Mo |
+| `mysql` | 0.75 | 512 Mo |
+
+Soit ~1,7 Go : prévoyez **au moins 2 Go de RAM**, sachant que Dokploy et
+Traefik consomment eux-mêmes quelques centaines de mégaoctets. Ajustez avec
+`APP_CPUS`, `APP_MEMORY`, `WORKER_CPUS`, `WORKER_MEMORY`, `DB_CPUS`,
+`DB_MEMORY`. Si vous augmentez `APP_MEMORY`, montez aussi `pm.max_children`
+dans `docker/php-fpm.conf` — les deux valeurs vont de pair (le calcul est
+détaillé dans le fichier).
+
+### Points de vigilance
+
+- **Le volume `storage`** porte les photos produits. Ne le supprimez jamais :
+  l'image est reconstruite à chaque déploiement, tout ce qui n'est pas dans
+  un volume disparaît.
+- **Le service `worker`** est indispensable : les notifications de commande
+  sont asynchrones. Sans lui, aucun email ne part, et les jobs s'empilent
+  silencieusement en base.
+- **Sauvegardez** la base et le volume `storage` — Dokploy ne le fait pas
+  pour vous.
 
 ## Tests
 
