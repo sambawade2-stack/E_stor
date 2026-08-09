@@ -14,8 +14,8 @@ class SettingSeeder extends Seeder
             'shop_tagline' => 'La technologie à portée de main',
             'shop_email' => 'contact@electroniques-stores.com',
             'shop_phone' => '+221 77 000 00 00',
+            // Pas de numéro WhatsApp distinct : shop_phone fait foi (cf. whatsapp_link()).
             'shop_address' => 'Dakar, Sénégal',
-            'whatsapp_number' => '221770000000',
             'currency' => 'XOF',
             'currency_symbol' => 'FCFA',
             'facebook_url' => '',

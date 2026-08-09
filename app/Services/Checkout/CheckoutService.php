@@ -83,7 +83,10 @@ class CheckoutService
             }
 
             $discount = $coupon?->discountFor($subtotal) ?? 0.0;
-            $shippingCost = (float) ($zone?->cost ?? 0);
+
+            // Livraison convenue avec le client après la commande : rien
+            // n'est facturé ici (cf. CartService::shippingCost).
+            $shippingCost = 0.0;
 
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),

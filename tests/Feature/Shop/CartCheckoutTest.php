@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -113,8 +114,10 @@ class CartCheckoutTest extends TestCase
         $this->assertSame(OrderStatus::Pending, $order->status);
         $this->assertSame('Dakar', $order->city);
         $this->assertEquals(20000, (float) $order->subtotal);
-        $this->assertEquals(2000, (float) $order->shipping_cost);
-        $this->assertEquals(22000, (float) $order->total);
+        // La livraison est convenue après la commande : rien n'est facturé ici
+        $this->assertEquals(0, (float) $order->shipping_cost);
+        $this->assertEquals(20000, (float) $order->total);
+        $this->assertSame('À convenir', $order->shippingLabel());
         $this->assertCount(1, $order->items);
 
         // Le stock est décrémenté et le panier vidé
@@ -155,6 +158,69 @@ class CartCheckoutTest extends TestCase
 
         $this->post(route('shop.checkout.store'), [])
             ->assertSessionHasErrors(['customer_name', 'customer_phone', 'address', 'shipping_zone_id', 'payment']);
+    }
+
+    /**
+     * Le tarif de la zone ne doit plus apparaître ni entrer dans le total :
+     * il varie selon le quartier et le volume, et se convient après coup.
+     */
+    public function test_the_shipping_zone_price_is_never_shown_nor_charged(): void
+    {
+        $this->post(route('shop.cart.add', $this->product));
+
+        foreach ([route('shop.cart'), route('shop.checkout')] as $url) {
+            $this->get($url)
+                ->assertOk()
+                ->assertSee('À convenir')
+                ->assertDontSee('2 000 FCFA'); // le coût de la zone Dakar
+        }
+
+        $this->post(route('shop.checkout.store'), [
+            'customer_name' => 'Awa Ndiaye',
+            'customer_phone' => '+221 77 123 45 67',
+            'address' => 'Sacré-Cœur 3',
+            'shipping_zone_id' => $this->zone->id,
+            'payment' => 'cash_on_delivery',
+        ]);
+
+        $order = Order::firstOrFail();
+
+        // La zone reste enregistrée : on doit savoir où livrer
+        $this->assertSame('Dakar', $order->city);
+        $this->assertEquals(0, (float) $order->shipping_cost);
+        $this->assertEquals($order->subtotal, $order->total);
+
+        $this->get(route('shop.order.confirmation', $order))
+            ->assertOk()
+            ->assertSee('À convenir');
+    }
+
+    /**
+     * CheckoutService ajuste le stock avec decrement(), qui ne déclenche
+     * aucun événement Eloquent : sans purge explicite, l'accueil restait
+     * figé jusqu'à 10 minutes après la vente du dernier exemplaire.
+     */
+    public function test_the_home_page_cache_is_cleared_when_an_order_is_placed(): void
+    {
+        $this->product->update(['is_featured' => true, 'stock_quantity' => 1]);
+
+        $this->get(route('shop.home'))->assertOk();
+        $this->assertTrue(Cache::has('home.sections'), 'Le cache de l\'accueil devrait être rempli.');
+
+        $this->post(route('shop.cart.add', $this->product));
+        $this->post(route('shop.checkout.store'), [
+            'customer_name' => 'Awa Ndiaye',
+            'customer_phone' => '+221 77 123 45 67',
+            'address' => 'Sacré-Cœur 3',
+            'shipping_zone_id' => $this->zone->id,
+            'payment' => 'cash_on_delivery',
+        ]);
+
+        $this->assertSame(0, $this->product->fresh()->stock_quantity);
+        $this->assertFalse(
+            Cache::has('home.sections'),
+            'Le cache de l\'accueil doit être purgé pour refléter le nouveau stock.'
+        );
     }
 
     /**

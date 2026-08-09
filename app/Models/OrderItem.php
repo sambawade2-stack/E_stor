@@ -35,4 +35,20 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
+
+    /**
+     * Vignette de l'article, avec repli sur l'image générique.
+     *
+     * La ligne de commande fige le nom, le SKU et le prix, mais pas l'image :
+     * on affiche donc celle du produit tel qu'il est aujourd'hui. Si le
+     * produit a été supprimé, ou n'a jamais eu de photo, on retombe sur le
+     * visuel par défaut plutôt que sur une image cassée.
+     *
+     * Suppose la relation product.primaryImage déjà chargée (preventLazyLoading).
+     */
+    public function imageUrl(): string
+    {
+        return $this->product?->primaryImage?->url()
+            ?? asset('images/placeholder-product.svg');
+    }
 }

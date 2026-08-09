@@ -53,7 +53,7 @@ class OrderTrackingController extends Controller
     {
         abort_unless($access->allows($order), 404);
 
-        $order->load('items');
+        $order->load('items.product.primaryImage');
 
         return view('shop.order-tracking-result', compact('order'));
     }

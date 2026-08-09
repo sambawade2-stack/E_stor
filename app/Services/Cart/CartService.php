@@ -239,9 +239,15 @@ class CartService
         return $this->coupon()?->discountFor($this->subtotal()) ?? 0.0;
     }
 
+    /**
+     * Les frais de livraison ne sont plus facturés en ligne : ils varient
+     * selon le quartier, le volume et le moment, et sont convenus avec le
+     * client à la confirmation. La zone reste demandée pour savoir où
+     * livrer, mais n'entre plus dans le total.
+     */
     public function shippingCost(): float
     {
-        return (float) ($this->shippingZone()?->cost ?? 0);
+        return 0.0;
     }
 
     public function total(): float

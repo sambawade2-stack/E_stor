@@ -45,11 +45,12 @@
         <section class="rounded-2xl border border-gray-100 bg-white p-6">
             <h2 class="mb-5 text-lg font-bold">WhatsApp & réseaux sociaux</h2>
             <div class="grid gap-5 sm:grid-cols-2">
-                <div class="sm:col-span-2">
-                    <label for="whatsapp_number" class="mb-1.5 block text-sm font-medium text-gray-700">Numéro WhatsApp * <span class="text-gray-400">(chiffres uniquement, avec indicatif — ex. 221770000000)</span></label>
-                    <input type="text" id="whatsapp_number" name="whatsapp_number" required value="{{ old('whatsapp_number', $settings['whatsapp_number'] ?? '') }}"
-                           class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                    @error('whatsapp_number')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
+                {{-- Plus de numéro WhatsApp distinct : il divergeait du téléphone
+                     de la boutique et le site renvoyait vers le mauvais contact. --}}
+                <div class="sm:col-span-2 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                    WhatsApp utilise le <strong class="text-gray-900">téléphone</strong> saisi dans
+                    « Informations générales » : <strong class="text-gray-900">{{ setting('shop_phone') ?: 'non renseigné' }}</strong>.
+                    Modifiez-le ci-dessus pour changer le numéro de contact du site.
                 </div>
                 <div>
                     <label for="facebook_url" class="mb-1.5 block text-sm font-medium text-gray-700">Facebook</label>

@@ -87,7 +87,7 @@
         @if ($order->discount > 0)
             <div class="discount"><span>Remise @if($order->coupon_code)({{ $order->coupon_code }})@endif</span><span>−{{ format_price($order->discount) }}</span></div>
         @endif
-        <div><span>Livraison ({{ $order->city }})</span><span>{{ format_price($order->shipping_cost) }}</span></div>
+        <div><span>Livraison ({{ $order->city }})</span><span>{{ $order->shippingLabel() }}</span></div>
         <div class="grand"><span>Total</span><span>{{ format_price($order->total) }}</span></div>
     </div>
 
@@ -96,7 +96,10 @@
         Merci pour votre confiance !
     </p>
 
-    <button class="print-btn" onclick="window.print()">🖨 Imprimer</button>
+    {{-- data-print + script externe : un onclick= serait bloqué par la CSP --}}
+    <button class="print-btn" data-print>🖨 Imprimer</button>
+
+    <script src="{{ asset('js/invoice-print.js') }}"></script>
 
 </body>
 </html>

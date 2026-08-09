@@ -122,7 +122,7 @@ class CheckoutController extends Controller
     {
         abort_unless($this->guestAccess->allows($order), 404);
 
-        $order->load('items');
+        $order->load('items.product.primaryImage');
 
         return view('shop.order-confirmation', compact('order'));
     }

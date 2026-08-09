@@ -101,13 +101,13 @@
                     {{-- Estimation livraison --}}
                     <form action="{{ route('shop.cart.shipping') }}" method="POST">
                         @csrf
-                        <label for="shipping_zone_id" class="mb-1.5 block text-sm font-medium text-gray-700">Estimer la livraison</label>
-                        <select id="shipping_zone_id" name="shipping_zone_id" onchange="this.form.submit()"
+                        <label for="shipping_zone_id" class="mb-1.5 block text-sm font-medium text-gray-700">Zone de livraison</label>
+                        <select id="shipping_zone_id" name="shipping_zone_id" x-data @change="$el.form.submit()"
                                 class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
                             <option value="" disabled @selected(! $zone)>Choisir ma zone…</option>
                             @foreach ($zones as $z)
                                 <option value="{{ $z->id }}" @selected($zone?->id === $z->id)>
-                                    {{ $z->name }} — {{ format_price($z->cost) }} ({{ $z->delivery_delay }})
+                                    {{ $z->name }} ({{ $z->delivery_delay }})
                                 </option>
                             @endforeach
                         </select>
@@ -127,7 +127,7 @@
                         @endif
                         <div class="flex justify-between">
                             <dt class="text-gray-500">Livraison</dt>
-                            <dd class="font-medium">{{ $zone ? format_price($shippingCost) : 'À estimer' }}</dd>
+                            <dd class="font-medium text-gray-500">À convenir</dd>
                         </div>
                         <div class="flex justify-between border-t border-gray-200 pt-2.5 text-base font-extrabold">
                             <dt>Total</dt>

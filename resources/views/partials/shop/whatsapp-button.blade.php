@@ -1,5 +1,14 @@
-{{-- Bouton WhatsApp flottant --}}
-<a href="{{ whatsapp_link($whatsappMessage ?? 'Bonjour ! J\'ai besoin d\'informations sur vos produits.') }}"
+{{-- Bouton WhatsApp flottant.
+     Ordre de priorité du message : celui que la page impose (fiche produit,
+     confirmation…), sinon la dernière commande de la session pour que le
+     client n'ait pas à retrouver son numéro, sinon un message générique. --}}
+@php
+    $waMessage = $whatsappMessage
+        ?? ($lastOrderNumber
+            ? 'Bonjour ! J\'ai une question sur ma commande '.$lastOrderNumber
+            : 'Bonjour ! J\'ai besoin d\'informations sur vos produits.');
+@endphp
+<a href="{{ whatsapp_link($waMessage) }}"
    target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp"
    class="group fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 p-3.5 text-white shadow-xl shadow-emerald-500/40 transition duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/50 sm:bottom-6 sm:right-6">
     <span class="absolute inset-0 -z-10 animate-ping rounded-full bg-emerald-500 opacity-20"></span>

@@ -8,12 +8,10 @@
     </div>
 
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
-         x-data="{ zones: {{ Js::from($zones->mapWithKeys(fn ($z) => [$z->id => (float) $z->cost])) }},
-                   zone: '{{ old('shipping_zone_id', $zone?->id) }}',
+         x-data="{ zone: '{{ old('shipping_zone_id', $zone?->id) }}',
                    subtotal: {{ $subtotal }},
                    discount: {{ $discount }},
-                   get shipping() { return this.zones[this.zone] ?? null },
-                   get total() { return this.subtotal - this.discount + (this.shipping ?? 0) },
+                   get total() { return this.subtotal - this.discount },
                    fmt(n) { return new Intl.NumberFormat('fr-FR').format(n) + ' {{ setting('currency_symbol') }}' } }">
 
         <form action="{{ route('shop.checkout.store') }}" method="POST" class="grid gap-8 lg:grid-cols-[1fr_24rem]">
@@ -65,7 +63,7 @@
                                     class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
                                 <option value="" disabled>Choisir…</option>
                                 @foreach ($zones as $z)
-                                    <option value="{{ $z->id }}">{{ $z->name }} — {{ format_price($z->cost) }} ({{ $z->delivery_delay }})</option>
+                                    <option value="{{ $z->id }}">{{ $z->name }} ({{ $z->delivery_delay }})</option>
                                 @endforeach
                             </select>
                             @error('shipping_zone_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
@@ -141,7 +139,7 @@
                     @endif
                     <div class="flex justify-between">
                         <dt class="text-gray-500">Livraison</dt>
-                        <dd class="font-medium" x-text="shipping === null ? 'À choisir' : fmt(shipping)"></dd>
+                        <dd class="font-medium text-gray-500">À convenir</dd>
                     </div>
                     <div class="flex justify-between border-t border-gray-200 pt-2.5 text-base font-extrabold">
                         <dt>Total</dt>

@@ -18,7 +18,11 @@
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($order->items as $item)
                             <tr>
-                                <td class="px-6 py-3.5">
+                                <td class="py-3.5 pl-6 pr-3">
+                                    <img src="{{ $item->imageUrl() }}" alt="{{ $item->product_name }}" loading="lazy"
+                                         class="h-14 w-14 shrink-0 rounded-lg border border-gray-100 bg-gray-50 object-cover">
+                                </td>
+                                <td class="py-3.5 pr-6">
                                     @if ($item->product)
                                         <a href="{{ route('shop.product', $item->product) }}" target="_blank" class="font-medium hover:text-primary-600">{{ $item->product_name }}</a>
                                     @else
@@ -37,7 +41,7 @@
                     @if ($order->discount > 0)
                         <div class="flex justify-between text-emerald-600"><dt>Remise @if($order->coupon_code)({{ $order->coupon_code }})@endif</dt><dd>−{{ format_price($order->discount) }}</dd></div>
                     @endif
-                    <div class="flex justify-between"><dt class="text-gray-500">Livraison</dt><dd class="font-medium">{{ format_price($order->shipping_cost) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">Livraison</dt><dd class="font-medium">{{ $order->shippingLabel() }}</dd></div>
                     <div class="flex justify-between pt-1 text-base font-extrabold"><dt>Total</dt><dd>{{ format_price($order->total) }}</dd></div>
                 </dl>
             </section>

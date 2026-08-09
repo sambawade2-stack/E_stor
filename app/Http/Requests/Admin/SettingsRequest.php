@@ -20,9 +20,10 @@ class SettingsRequest extends FormRequest
             'shop_name' => ['required', 'string', 'max:100'],
             'shop_tagline' => ['nullable', 'string', 'max:150'],
             'shop_email' => ['required', 'email', 'max:255'],
-            'shop_phone' => ['required', 'string', 'max:30'],
+            // Ce téléphone sert aussi de numéro WhatsApp du site : il doit
+            // rester composable, indicatif pays compris.
+            'shop_phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9 ]{8,20}$/'],
             'shop_address' => ['nullable', 'string', 'max:255'],
-            'whatsapp_number' => ['required', 'string', 'max:20', 'regex:/^[0-9]{8,15}$/'],
             'currency_symbol' => ['required', 'string', 'max:10'],
             'facebook_url' => ['nullable', 'url', 'max:255'],
             'instagram_url' => ['nullable', 'url', 'max:255'],
@@ -39,7 +40,7 @@ class SettingsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'whatsapp_number.regex' => 'Le numéro WhatsApp doit contenir uniquement des chiffres, indicatif inclus (ex. 221770000000).',
+            'shop_phone.regex' => 'Le téléphone doit contenir uniquement des chiffres et espaces, indicatif compris (ex. +221 77 000 00 00). Il sert aussi de numéro WhatsApp.',
         ];
     }
 }

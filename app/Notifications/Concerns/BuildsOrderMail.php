@@ -21,7 +21,7 @@ trait BuildsOrderMail
         }
 
         return $mail
-            ->line("Livraison ({$order->city}) : ".format_price($order->shipping_cost))
+            ->line("Livraison ({$order->city}) : ".$order->shippingLabel())
             ->line('**Total : '.format_price($order->total).'**')
             ->line("Adresse de livraison : {$order->address}, {$order->city}")
             ->line("Téléphone : {$order->customer_phone}");

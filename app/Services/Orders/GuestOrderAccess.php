@@ -45,6 +45,16 @@ class GuestOrderAccess
     }
 
     /**
+     * Numéro de la dernière commande passée dans cette session, s'il y en a
+     * une. Permet au bouton WhatsApp de rappeler la commande en cours depuis
+     * n'importe quelle page, sans que le client ait à le retrouver.
+     */
+    public function latestNumber(): ?string
+    {
+        return $this->numbers()[0] ?? null;
+    }
+
+    /**
      * @return array<int, string>
      */
     private function numbers(): array

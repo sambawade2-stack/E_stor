@@ -91,7 +91,7 @@ class PaymentTest extends TestCase
         $this->assertSame(PaymentProvider::PayDunya, $order->payment_provider);
         $this->assertSame(PaymentStatus::Pending, $payment->status);
         $this->assertSame('tok_123', $payment->checkout_token);
-        $this->assertEquals(12000, (float) $payment->amount);
+        $this->assertEquals(10000, (float) $payment->amount); // livraison non facturée
     }
 
     public function test_checkout_survives_a_paydunya_outage(): void
@@ -202,7 +202,7 @@ class PaymentTest extends TestCase
             ]),
             '*/checkout-invoice/confirm/*' => Http::response([
                 'status' => 'completed',
-                'invoice' => ['total_amount' => 100], // au lieu de 12 000
+                'invoice' => ['total_amount' => 100], // au lieu de 10 000
             ]),
         ]);
 
@@ -232,7 +232,7 @@ class PaymentTest extends TestCase
             ]),
             '*/checkout-invoice/confirm/*' => Http::response([
                 'status' => 'completed',
-                'invoice' => ['total_amount' => 12000], // 10 000 + 2 000 de port
+                'invoice' => ['total_amount' => 10000], // livraison non facturée
             ]),
         ]);
 

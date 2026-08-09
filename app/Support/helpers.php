@@ -45,11 +45,17 @@ if (! function_exists('json_ld')) {
 
 if (! function_exists('whatsapp_link')) {
     /**
-     * Construit un lien wa.me vers le numéro WhatsApp de la boutique.
+     * Construit un lien wa.me vers le numéro de la boutique.
+     *
+     * La source de vérité est le téléphone des « Informations générales » :
+     * un second réglage dédié à WhatsApp finissait par diverger, et le site
+     * renvoyait alors vers un numéro qui n'était plus le bon.
+     * Les séparateurs (+, espaces) sont retirés, wa.me n'acceptant que des
+     * chiffres avec l'indicatif pays.
      */
     function whatsapp_link(?string $message = null): string
     {
-        $number = preg_replace('/\D/', '', (string) setting('whatsapp_number'));
+        $number = preg_replace('/\D/', '', (string) setting('shop_phone'));
         $url = "https://wa.me/{$number}";
 
         return $message ? $url.'?text='.rawurlencode($message) : $url;

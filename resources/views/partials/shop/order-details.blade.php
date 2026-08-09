@@ -14,9 +14,11 @@
 
     <ul class="divide-y divide-gray-100 px-6">
         @foreach ($order->items as $item)
-            <li class="flex items-center justify-between gap-4 py-3.5 text-sm">
-                <span class="min-w-0">
-                    <span class="line-clamp-1 font-medium text-gray-900">{{ $item->product_name }}</span>
+            <li class="flex items-center gap-3.5 py-3.5 text-sm">
+                <img src="{{ $item->imageUrl() }}" alt="{{ $item->product_name }}" loading="lazy"
+                     class="h-14 w-14 shrink-0 rounded-lg border border-gray-100 bg-gray-50 object-cover">
+                <span class="min-w-0 flex-1">
+                    <span class="line-clamp-2 font-medium text-gray-900">{{ $item->product_name }}</span>
                     <span class="text-xs text-gray-400">{{ format_price($item->unit_price) }} × {{ $item->quantity }}</span>
                 </span>
                 <span class="shrink-0 font-semibold">{{ format_price($item->total) }}</span>
@@ -29,7 +31,7 @@
         @if ($order->discount > 0)
             <div class="flex justify-between text-emerald-600"><dt>Remise @if($order->coupon_code)({{ $order->coupon_code }})@endif</dt><dd class="font-medium">−{{ format_price($order->discount) }}</dd></div>
         @endif
-        <div class="flex justify-between"><dt class="text-gray-500">Livraison ({{ $order->city }})</dt><dd class="font-medium">{{ format_price($order->shipping_cost) }}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-500">Livraison ({{ $order->city }})</dt><dd class="font-medium">{{ $order->shippingLabel() }}</dd></div>
         <div class="flex justify-between pt-1 text-base font-extrabold"><dt>Total</dt><dd>{{ format_price($order->total) }}</dd></div>
     </dl>
 </div>

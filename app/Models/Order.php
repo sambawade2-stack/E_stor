@@ -205,6 +205,20 @@ class Order extends Model
         ]);
     }
 
+    /**
+     * Frais de livraison tels qu'affichés au client.
+     *
+     * Ils ne sont plus facturés en ligne : variables selon le quartier et le
+     * volume, ils sont convenus à la confirmation de la commande. Tant qu'ils
+     * valent 0, on annonce « À convenir » plutôt qu'une gratuité trompeuse.
+     */
+    public function shippingLabel(): string
+    {
+        return (float) $this->shipping_cost > 0
+            ? format_price($this->shipping_cost)
+            : 'À convenir';
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === PaymentStatus::Paid;
