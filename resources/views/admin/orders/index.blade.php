@@ -4,7 +4,7 @@
         <form method="GET" class="flex flex-wrap items-center gap-2">
             <input type="search" name="q" value="{{ request('q') }}" placeholder="N°, nom, téléphone…"
                    class="w-56 rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
-            <select name="status" onchange="this.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
+            <select name="status" x-data @change="$el.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
                 <option value="">Tous les statuts</option>
                 @foreach ($statuses as $status)
                     <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>

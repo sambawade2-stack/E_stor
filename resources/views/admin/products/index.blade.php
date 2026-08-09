@@ -4,13 +4,13 @@
         <form method="GET" class="flex flex-wrap items-center gap-2">
             <input type="search" name="q" value="{{ request('q') }}" placeholder="Rechercher nom, SKU…"
                    class="w-56 rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
-            <select name="category" onchange="this.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
+            <select name="category" x-data @change="$el.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
                 <option value="">Toutes les catégories</option>
                 @foreach ($categories as $category)
                     <option value="{{ $category->id }}" @selected(request('category') == $category->id)>{{ $category->name }}</option>
                 @endforeach
             </select>
-            <select name="state" onchange="this.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
+            <select name="state" x-data @change="$el.form.submit()" class="rounded-xl border-gray-200 bg-white text-sm focus:border-primary-500 focus:ring-primary-500">
                 <option value="">Tous les produits</option>
                 <option value="inactive" @selected(request('state') === 'inactive')>Inactifs</option>
                 <option value="low_stock" @selected(request('state') === 'low_stock')>Stock faible</option>

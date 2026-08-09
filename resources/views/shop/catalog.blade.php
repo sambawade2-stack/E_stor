@@ -104,7 +104,7 @@
                             <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                         @endforeach
                         <label for="sort" class="text-sm text-gray-500">Trier :</label>
-                        <select id="sort" name="sort" onchange="this.form.submit()"
+                        <select id="sort" name="sort" x-data @change="$el.form.submit()"
                                 class="rounded-xl border-gray-200 py-2 text-sm focus:border-primary-500 focus:ring-primary-500">
                             <option value="recent" @selected(request('sort', 'recent') === 'recent')>Nouveautés</option>
                             <option value="popular" @selected(request('sort') === 'popular')>Popularité</option>
