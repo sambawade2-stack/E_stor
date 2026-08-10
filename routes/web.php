@@ -18,7 +18,6 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Shop\CatalogController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\HomeController;
-use App\Http\Controllers\Shop\NewsletterController;
 use App\Http\Controllers\Shop\OrderTrackingController;
 use App\Http\Controllers\Shop\PageController;
 use App\Http\Controllers\Shop\PaymentController;
@@ -70,10 +69,6 @@ Route::name('shop.')->group(function () {
         ->middleware('throttle:10,1')
         ->name('order.track.find');
     Route::get('/suivi/{order:order_number}', [OrderTrackingController::class, 'result'])->name('order.track.show');
-
-    Route::post('/newsletter', [NewsletterController::class, 'store'])
-        ->middleware('throttle:10,1')
-        ->name('newsletter.store');
 
     Route::get('/a-propos', [PageController::class, 'about'])->name('about');
     Route::get('/contact', [PageController::class, 'contact'])->name('contact');

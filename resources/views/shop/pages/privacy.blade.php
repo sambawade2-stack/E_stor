@@ -10,7 +10,7 @@
     <div class="mx-auto max-w-3xl space-y-8 px-4 py-12 text-sm leading-relaxed text-gray-600 sm:px-6 lg:px-8">
         <section>
             <h2 class="mb-3 text-lg font-bold text-gray-900">1. Données collectées</h2>
-            <p>Lors d'une commande ou de la création d'un compte, nous collectons uniquement les informations nécessaires au traitement : nom, téléphone, email, adresse de livraison et ville. L'inscription à la newsletter ne requiert que votre adresse email.</p>
+            <p>Lors d'une commande ou de la création d'un compte, nous collectons uniquement les informations nécessaires au traitement : nom, téléphone, email, adresse de livraison et ville.</p>
         </section>
         <section>
             <h2 class="mb-3 text-lg font-bold text-gray-900">2. Utilisation des données</h2>
@@ -26,7 +26,7 @@
         </section>
         <section>
             <h2 class="mb-3 text-lg font-bold text-gray-900">5. Vos droits</h2>
-            <p>Vous pouvez à tout moment demander l'accès, la rectification ou la suppression de vos données personnelles, ou vous désinscrire de la newsletter, en nous contactant à {{ setting('shop_email') }}.</p>
+            <p>Vous pouvez à tout moment demander l'accès, la rectification ou la suppression de vos données personnelles en nous contactant à {{ setting('shop_email') }}.</p>
         </section>
     </div>
 

@@ -299,33 +299,6 @@
         </section>
     @endif
 
-    {{-- ========================= NEWSLETTER =========================== --}}
-    <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div data-animate class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-primary-600 to-sky-500 px-6 py-12 text-center text-white shadow-2xl shadow-primary-600/30 sm:px-12">
-            <div class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 animate-blob rounded-full bg-white/10 blur-2xl"></div>
-            <div class="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 animate-blob animation-delay-4000 rounded-full bg-white/10 blur-2xl"></div>
-
-            <h2 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Restez informé(e)</h2>
-            <p class="mx-auto mt-2 max-w-xl text-sm text-primary-100">
-                Recevez en avant-première nos nouveautés et promotions exclusives.
-            </p>
-
-            @if (session('newsletter_success'))
-                <p class="mx-auto mt-6 w-fit rounded-full bg-white/15 px-5 py-2.5 text-sm font-medium">✓ {{ session('newsletter_success') }}</p>
-            @else
-                <form action="{{ route('shop.newsletter.store') }}" method="POST" class="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
-                    @csrf
-                    <input type="email" name="email" required placeholder="Votre adresse email"
-                           class="w-full rounded-full border-0 px-5 py-3 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white">
-                    <x-btn type="submit" variant="secondary" class="btn-shine shrink-0">S'inscrire</x-btn>
-                </form>
-                @error('email')
-                    <p class="mt-2 text-sm text-primary-100">{{ $message }}</p>
-                @enderror
-            @endif
-        </div>
-    </section>
-
     {{-- ====================== MARQUES PARTENAIRES ===================== --}}
     @if ($brands->isNotEmpty())
         <section class="border-t border-gray-100 py-10">
