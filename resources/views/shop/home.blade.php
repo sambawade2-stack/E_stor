@@ -66,7 +66,10 @@
                         'price' => format_price($p->current_price),
                     ]);
                 @endphp
-                <div data-animate style="--d: 200ms" class="relative hidden lg:block"
+                {{-- Visible sur tous les écrans : masqué sous 1024 px, le
+                     diaporama des produits vedettes n'était jamais vu par les
+                     visiteurs mobiles, qui sont pourtant les plus nombreux. --}}
+                <div data-animate style="--d: 200ms" class="relative"
                      x-data="{
                         slides: @js($slides),
                         active: 0,
@@ -80,7 +83,7 @@
                         $el.addEventListener('mouseenter', () => paused = true);
                         $el.addEventListener('mouseleave', () => paused = false);
                      }">
-                    <div class="animate-float mx-auto max-w-md rounded-3xl border border-white/10 bg-white/[0.07] p-8 shadow-2xl shadow-primary-900/40 backdrop-blur-xl">
+                    <div class="animate-float mx-auto max-w-md rounded-3xl border border-white/10 bg-white/[0.07] p-5 shadow-2xl shadow-primary-900/40 backdrop-blur-xl sm:p-8">
 
                         {{-- Image (fondu enchaîné entre les produits) --}}
                         <div class="group/slide relative aspect-square overflow-hidden rounded-2xl">
@@ -94,11 +97,11 @@
 
                             {{-- Flèches (survol desktop) --}}
                             <button type="button" @click="prev()" x-show="slides.length > 1" aria-label="Produit précédent"
-                                    class="absolute left-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white opacity-0 backdrop-blur transition duration-300 hover:bg-gray-950/70 group-hover/slide:opacity-100">
+                                    class="absolute left-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white backdrop-blur transition duration-300 hover:bg-gray-950/70 lg:opacity-0 lg:group-hover/slide:opacity-100">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
                             </button>
                             <button type="button" @click="next()" x-show="slides.length > 1" aria-label="Produit suivant"
-                                    class="absolute right-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white opacity-0 backdrop-blur transition duration-300 hover:bg-gray-950/70 group-hover/slide:opacity-100">
+                                    class="absolute right-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-gray-950/50 text-white backdrop-blur transition duration-300 hover:bg-gray-950/70 lg:opacity-0 lg:group-hover/slide:opacity-100">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                             </button>
                         </div>

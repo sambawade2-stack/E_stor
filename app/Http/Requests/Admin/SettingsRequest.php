@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\MaxImagePixels;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SettingsRequest extends FormRequest
@@ -32,8 +33,8 @@ class SettingsRequest extends FormRequest
             // le driver GD, qui ne sait décoder ni le SVG ni l'ICO (l'upload
             // partait en erreur 500). Un SVG stocké tel quel serait par
             // ailleurs un vecteur de XSS stocké.
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'favicon' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:512'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096', new MaxImagePixels],
+            'favicon' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:512', new MaxImagePixels],
         ];
     }
 
