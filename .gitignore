@@ -6,6 +6,9 @@
 .env
 .env.*
 !.env.example
+# Modèle de configuration cPanel : un exemple sans secret, que build.sh
+# copie dans l'archive. La règle .env.* ci-dessus l'excluait.
+!deploy/cpanel/.env.cpanel.example
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -25,3 +28,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Archives de déploiement produites par deploy/cpanel/build.sh
+/deploy/dist

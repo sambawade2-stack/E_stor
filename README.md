@@ -6,7 +6,7 @@ Boutique e-commerce d'accessoires électroniques — Laravel 12, Blade, Tailwind
 
 ## Fonctionnalités
 
-- **Vitrine** : accueil complet (hero, catégories, vedettes, promos, avis, newsletter), catalogue avec filtres/tri/recherche, fiches produit (galerie, zoom, caractéristiques, avis, produits similaires), pages statiques
+- **Vitrine** : accueil complet (hero, catégories, vedettes, promos, avis), catalogue avec filtres/tri/recherche, fiches produit (galerie, zoom, caractéristiques, avis, produits similaires), pages statiques
 - **Panier & checkout** : panier en session, coupons, estimation de livraison par zone, commande invité en une étape
 - **Comptes clients** : historique des commandes, rattachement automatique des commandes invité par email
 - **Paiements** : architecture multi-passerelles (PayDunya → Wave, Orange Money, cartes ; paiement à la livraison), webhooks confirmés serveur-à-serveur
@@ -59,7 +59,7 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 2. **Laisser `ADMIN_DEFAULT_PASSWORD` vide** : le seeder génère alors un mot de passe aléatoire affiché une seule fois. Ne jamais committer de mot de passe dans `.env.example`
 3. MySQL configuré (voir ci-dessus) — les données de démonstration ne sont pas seedées en production
 4. SMTP réel (`MAIL_*`) pour les emails de commande **et de vérification d'adresse** — sans SMTP fonctionnel, les clients ne peuvent pas vérifier leur email, et les commandes passées en invité ne leur sont jamais rattachées
-5. Worker de queue : `php artisan queue:work` (superviser avec Supervisor/systemd)
+5. Traitement de la file — **sans lui, aucun email ne part**. Sur serveur dédié ou en conteneur : `php artisan queue:work` supervisé (Supervisor/systemd). Sur mutualisé, où aucun processus permanent n'est possible : la tâche cron `schedule:run` (voir *Déploiement sur cPanel*)
 6. Clés PayDunya (`PAYDUNYA_*`, `PAYDUNYA_MODE=live`) — le paiement en ligne s'active automatiquement dès qu'elles sont renseignées ; déclarer l'IPN `https://votre-domaine/webhooks/paydunya`
 7. Optimisations : `php artisan config:cache route:cache view:cache event:cache` et `npm run build`
 8. HTTPS obligatoire (forcé automatiquement en production) + certificat — le cookie de session passe en `Secure` automatiquement dès `APP_ENV=production`
@@ -148,10 +148,132 @@ détaillé dans le fichier).
 - **Sauvegardez** la base et le volume `storage` — Dokploy ne le fait pas
   pour vous.
 
+## Déploiement sur cPanel (hébergement mutualisé)
+
+Un mutualisé n'offre ni Node, ni processus permanent, et sert par défaut le
+dossier `public_html`. Les fichiers de `deploy/cpanel/` répondent à ces trois
+contraintes.
+
+### 1. Construire le paquet, sur votre machine
+
+```bash
+./deploy/cpanel/build.sh
+```
+
+Le script installe les dépendances sans les outils de développement, compile
+les assets, sépare l'application de la racine web et produit
+`deploy/dist/electroniques-AAAAMMJJ-HHMM.zip` (~9 Mo). Il restaure ensuite
+vos dépendances de développement, pour que les tests restent exécutables.
+
+L'archive contient deux dossiers :
+
+| Dossier | Destination sur le serveur |
+| --- | --- |
+| `app/` | `/home/COMPTE/app` — **hors** de la racine web |
+| `public_html/` | le contenu va dans la racine web du domaine |
+
+Cette séparation n'est pas cosmétique : si l'application se trouvait dans la
+racine web, votre `.env` — identifiants de base, clés de paiement — serait
+téléchargeable depuis un navigateur.
+
+### 2. Base de données
+
+cPanel > **Bases de données MySQL** : créez une base, un utilisateur, et
+associez-les avec tous les privilèges. cPanel préfixe les noms avec votre
+compte (`moncompte_boutique`) : reprenez-les tels qu'affichés.
+
+### 3. Configuration
+
+Générez la clé sur votre machine :
+
+```bash
+php artisan key:generate --show
+```
+
+Sur le serveur, copiez `app/.env.example.cpanel` en `app/.env`, puis
+renseignez `APP_KEY`, `APP_URL`, les identifiants de base et le SMTP. Le
+modèle documente chaque valeur.
+
+### 4. Racine web
+
+**Solution à privilégier** — cPanel > *Domaines* : faites pointer la racine du
+domaine vers `/home/COMPTE/app/public`. Vous téléversez alors le projet tel
+quel, sans séparation, et les mises à jour sont plus simples.
+
+**Repli** — si l'hébergeur refuse : placez le contenu de `public_html/` de
+l'archive dans la racine web. Le `index.php` fourni y démarre l'application
+située un niveau au-dessus (ajustez `$basePath` s'il porte un autre nom).
+
+### 5. Initialiser
+
+Depuis le Terminal cPanel, ou en SSH, dans `/home/COMPTE/app` :
+
+```bash
+php artisan migrate --force
+php artisan db:seed --class=RoleAndPermissionSeeder --force
+php artisan db:seed --class=AdminUserSeeder --force
+php artisan storage:link
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+```
+
+Si `storage:link` échoue (fonction `symlink()` désactivée par l'hébergeur),
+créez le lien à la main depuis le gestionnaire de fichiers : la racine web
+doit contenir un `storage` pointant vers `app/storage/app/public`. Sans lui,
+**aucune photo produit ne s'affiche**.
+
+### 6. La tâche cron — sans elle, aucun email ne part
+
+C'est l'étape que l'on oublie. Les notifications de commande sont
+asynchrones : sans traitement de la file, ni le client ni vous ne recevez
+quoi que ce soit, et les jobs s'accumulent en base sans le moindre message
+d'erreur.
+
+cPanel > **Tâches Cron**, une exécution *chaque minute* :
+
+```
+* * * * * /usr/local/bin/php /home/COMPTE/app/artisan schedule:run >> /dev/null 2>&1
+```
+
+Une seule ligne suffit : le planificateur de Laravel (`routes/console.php`)
+déclenche le traitement de la file et la purge des jobs échoués. Vérifiez le
+chemin de PHP auprès de votre hébergeur — il varie (`/usr/local/bin/php`,
+`/opt/cpanel/ea-php83/root/usr/bin/php`…), et doit être en **8.2 minimum**.
+
+Contrôle après quelques minutes :
+
+```bash
+php artisan queue:failed   # doit rester vide
+```
+
+### 7. Sécuriser
+
+Activez **AutoSSL** (cPanel > SSL/TLS) : le HTTPS est requis, l'application
+force ce schéma en production et le webhook PayDunya l'exige. Changez ensuite
+le mot de passe administrateur, puis retirez `ADMIN_DEFAULT_PASSWORD` du
+`.env`.
+
+### Mettre à jour le site
+
+Relancez `build.sh`, remplacez le contenu de `app/` et de la racine web
+— **en préservant `app/.env` et `app/storage/app/public`**, qui portent votre
+configuration et vos photos — puis :
+
+```bash
+php artisan migrate --force
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+```
+
+### Limites à connaître
+
+Le délai d'envoi des emails atteint une minute (le cron ne peut pas tourner
+plus souvent). La mémoire d'un mutualisé étant limitée, abaissez
+`SHOP_MAX_IMAGE_PIXELS` si l'envoi d'une photo échoue. Enfin, aucune de ces
+contorsions n'est nécessaire sur un VPS : voir la section Dokploy.
+
 ## Tests
 
 ```bash
-php artisan test   # 61 tests, 208 assertions
+php artisan test   # 118 tests, 417 assertions
 ```
 
 ## Architecture
