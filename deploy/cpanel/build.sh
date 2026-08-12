@@ -8,15 +8,21 @@
 #
 #   ./deploy/cpanel/build.sh
 #
-# Produit deploy/dist/electroniques-AAAAMMJJ-HHMM.zip
+# Produit, dans deploy/dist/ :
+#   app/          les deux dossiers, prêts à glisser dans un client FTP
+#   public_html/
+#   electroniques-AAAAMMJJ-HHMM.zip   la même chose compressée, pour le
+#                                     gestionnaire de fichiers de cPanel
 #
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 RACINE="$(pwd)"
 HORODATAGE="$(date +%Y%m%d-%H%M)"
-TRAVAIL="$(mktemp -d)"
 SORTIE="$RACINE/deploy/dist"
+# On construit directement dans deploy/dist : les dossiers restent
+# disponibles après coup, pour téléverser sans passer par l'archive.
+TRAVAIL="$SORTIE"
 ARCHIVE="$SORTIE/electroniques-$HORODATAGE.zip"
 
 # « composer install --no-dev » ci-dessous retire PHPUnit et Pint de votre
@@ -24,7 +30,6 @@ ARCHIVE="$SORTIE/electroniques-$HORODATAGE.zip"
 # une construction. On remet donc l'environnement de développement en
 # partant, y compris en cas d'interruption.
 nettoyer() {
-    rm -rf "$TRAVAIL"
     if [ "${DEV_A_RESTAURER:-0}" = "1" ]; then
         echo "→ Restauration des dépendances de développement"
         composer install --quiet --no-interaction
@@ -45,8 +50,11 @@ echo "→ Compilation des assets"
 npm ci --silent
 npm run build
 
-echo "→ Copie des fichiers de l'application"
+echo "→ Nettoyage de la construction précédente"
+rm -rf "$TRAVAIL/app" "$TRAVAIL/public_html"
 mkdir -p "$TRAVAIL/app"
+
+echo "→ Copie des fichiers de l'application"
 # --delete-excluded n'a pas lieu d'être : on part d'un dossier vide.
 rsync -a \
     --exclude='.git' \
@@ -105,21 +113,26 @@ echo "→ Modèle de configuration"
 cp "$RACINE/deploy/cpanel/.env.cpanel.example" "$TRAVAIL/app/.env.example.cpanel"
 
 echo "→ Compression"
-mkdir -p "$SORTIE"
+rm -f "$SORTIE"/electroniques-*.zip
 (cd "$TRAVAIL" && zip -qr "$ARCHIVE" app public_html)
 
-TAILLE="$(du -h "$ARCHIVE" | cut -f1)"
+TAILLE_ZIP="$(du -h "$ARCHIVE" | cut -f1)"
+TAILLE_APP="$(du -sh "$TRAVAIL/app" | cut -f1)"
+TAILLE_WEB="$(du -sh "$TRAVAIL/public_html" | cut -f1)"
 
 cat <<MESSAGE
 
-   Archive prête : $ARCHIVE  ($TAILLE)
+   Prêt dans deploy/dist/
 
-   Elle contient deux dossiers :
-     app/          -> à téléverser HORS de la racine web (/home/COMPTE/app)
-     public_html/  -> contenu à placer dans la racine web du domaine
+     app/          $TAILLE_APP   ->  /home/COMPTE/app        (HORS racine web)
+     public_html/  $TAILLE_WEB   ->  racine web du domaine
 
-   Étapes suivantes : voir la section « Déploiement sur cPanel » du README.
-   N'oubliez pas le .env sur le serveur (modèle : app/.env.example.cpanel)
-   et la tâche cron du planificateur, sans laquelle aucun email ne partira.
+     electroniques-$HORODATAGE.zip  ($TAILLE_ZIP)
+                   les deux dossiers compressés, si vous passez par le
+                   gestionnaire de fichiers de cPanel plutôt que par FTP.
+
+   Rappels : le .env va dans app/ sur le serveur (modèle fourni :
+   app/.env.example.cpanel), et sans la tâche cron du planificateur,
+   aucun email ne partira. Procédure : section « cPanel » du README.
 
 MESSAGE
