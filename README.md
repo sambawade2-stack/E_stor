@@ -284,3 +284,5 @@ php artisan test   # 118 tests, 417 assertions
 - `app/Services/Images` — optimisation WebP des images (Intervention Image)
 - `app/Enums` — statuts de commande/paiement avec transitions autorisées
 - `app/Events` + `app/Listeners` + `app/Notifications` — emails de commande
+# E_stor
+# E_stor
