@@ -1,0 +1,51 @@
+---
+# Déploiement cPanel depuis Git.
+#
+# cPanel > « Git Version Control » lit ce fichier à chaque clic sur
+# « Deploy HEAD Commit » et exécute les tâches ci-dessous.
+#
+# Disposition attendue — le dépôt est cloné dans ~/app :
+#
+#     /home/COMPTE/
+#         app/           <- le dépôt Git (source, hors racine web)
+#         public_html/    <- racine web, alimentée par ce fichier
+#
+# Ce que ces tâches font : recopier la partie publique dans la racine web,
+# poser le point d'entrée adapté, appliquer les migrations et régénérer les
+# caches. Elles ne touchent JAMAIS au .env ni aux photos déjà envoyées.
+#
+# Ce qu'elles ne font pas : installer les dépendances PHP. « composer
+# install » n'est lancé que si Composer existe sur le serveur — sinon,
+# téléversez vendor/ une fois par FTP (il ne change qu'à la mise à jour
+# d'une dépendance).
+
+deployment:
+  tasks:
+    - export DEPOT="$PWD"
+    - export WEB="$HOME/public_html"
+
+    # --- Partie publique -------------------------------------------------
+    # Le contenu de public/ va dans la racine web. On ne supprime rien :
+    # « storage » (lien vers les photos) et « .env » éventuellement présents
+    # doivent survivre au déploiement.
+    - /bin/cp -R "$DEPOT/public/." "$WEB/"
+
+    # Point d'entrée adapté à la séparation app / public_html : celui de
+    # public/ chercherait l'application dans son propre dossier parent.
+    - /bin/cp "$DEPOT/deploy/cpanel/index.php" "$WEB/index.php"
+
+    # --- Dépendances PHP -------------------------------------------------
+    # Sautées sans bruit si Composer n'est pas disponible.
+    - cd "$DEPOT" && (command -v composer >/dev/null 2>&1 && composer install --no-dev --optimize-autoloader --no-interaction || echo "Composer absent : vendor/ doit être téléversé manuellement")
+
+    # --- Base et caches --------------------------------------------------
+    # --force : indispensable, aucune confirmation n'est possible ici.
+    - cd "$DEPOT" && php artisan migrate --force
+    - cd "$DEPOT" && php artisan config:cache
+    - cd "$DEPOT" && php artisan route:cache
+    - cd "$DEPOT" && php artisan view:cache
+    - cd "$DEPOT" && php artisan event:cache
+
+    # --- Lien vers les photos --------------------------------------------
+    # Recréé s'il manque ; sans lui, aucune photo produit ne s'affiche.
+    - test -L "$WEB/storage" || ln -s "$DEPOT/storage/app/public" "$WEB/storage" || true
