@@ -23,8 +23,7 @@ class CheckoutController extends Controller
         private readonly CartService $cart,
         private readonly PaymentManager $payments,
         private readonly GuestOrderAccess $guestAccess,
-    ) {
-    }
+    ) {}
 
     public function show(): View|RedirectResponse
     {

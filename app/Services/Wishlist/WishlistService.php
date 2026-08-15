@@ -13,9 +13,7 @@ class WishlistService
 {
     private const KEY = 'wishlist.items';
 
-    public function __construct(private readonly Session $session)
-    {
-    }
+    public function __construct(private readonly Session $session) {}
 
     /**
      * Ajoute ou retire un produit. Retourne true s'il a été ajouté.

@@ -18,8 +18,7 @@ final readonly class PaymentVerification
         public ?string $reference,
         public array $payload = [],
         public ?float $amount = null,
-    ) {
-    }
+    ) {}
 
     public function isPaid(): bool
     {

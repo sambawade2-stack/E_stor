@@ -14,9 +14,7 @@ use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function __construct(private readonly CartService $cart)
-    {
-    }
+    public function __construct(private readonly CartService $cart) {}
 
     public function index(): View
     {

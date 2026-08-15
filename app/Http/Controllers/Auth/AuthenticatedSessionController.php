@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,14 +28,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Rattache les éventuelles commandes passées en invité avec cet email,
-        // uniquement si l'adresse a été vérifiée : elle sert de preuve de
-        // propriété sur des données personnelles (adresse, téléphone).
-        if ($request->user()->hasVerifiedEmail()) {
-            Order::claimFor($request->user());
-        }
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Seule l'équipe de la boutique dispose d'un compte : la connexion
+        // mène à l'administration, et non à un espace client — il n'y en a
+        // plus. Les clients commandent et suivent leur livraison sans compte.
+        return redirect()->intended(
+            $request->user()->isAdmin()
+                ? route('admin.dashboard', absolute: false)
+                : route('shop.home', absolute: false)
+        );
     }
 
     /**

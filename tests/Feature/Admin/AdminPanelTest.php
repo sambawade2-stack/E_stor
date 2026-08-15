@@ -63,13 +63,6 @@ class AdminPanelTest extends TestCase
         }
     }
 
-    public function test_an_admin_is_redirected_from_customer_dashboard_to_admin_dashboard(): void
-    {
-        $this->actingAs($this->admin)
-            ->get(route('dashboard'))
-            ->assertRedirect(route('admin.dashboard'));
-    }
-
     public function test_an_admin_can_create_a_product(): void
     {
         $category = Category::create(['name' => 'Chargeurs']);

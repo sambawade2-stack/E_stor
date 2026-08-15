@@ -26,16 +26,10 @@
             </div>
         @endisset
 
-        <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div class="grid gap-8 lg:grid-cols-[15rem_1fr]">
-                <aside class="h-fit rounded-2xl border border-gray-100 p-3">
-                    @include('partials.shop.account-nav')
-                </aside>
-
-                <div>
-                    {{ $slot }}
-                </div>
-            </div>
+        {{-- Plus de menu latéral : l'espace client a disparu avec les comptes
+             clients. Ce gabarit ne sert plus qu'au profil de l'équipe. --}}
+        <main class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+            {{ $slot }}
         </main>
 
         @include('partials.shop.footer')

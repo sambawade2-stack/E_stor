@@ -62,7 +62,7 @@ class Product extends Model
     }
 
     /* ----------------------------------------------------------------- */
-    /* Relations                                                          */
+    /* Relations */
     /* ----------------------------------------------------------------- */
 
     public function category(): BelongsTo
@@ -103,7 +103,7 @@ class Product extends Model
     }
 
     /* ----------------------------------------------------------------- */
-    /* Scopes                                                             */
+    /* Scopes */
     /* ----------------------------------------------------------------- */
 
     public function scopeActive(Builder $query): Builder
@@ -138,7 +138,7 @@ class Product extends Model
     }
 
     /* ----------------------------------------------------------------- */
-    /* Accessors / helpers                                                */
+    /* Accessors / helpers */
     /* ----------------------------------------------------------------- */
 
     public function isOnSale(): bool

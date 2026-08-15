@@ -8,7 +8,7 @@ Boutique e-commerce d'accessoires électroniques — Laravel 12, Blade, Tailwind
 
 - **Vitrine** : accueil complet (hero, catégories, vedettes, promos, avis), catalogue avec filtres/tri/recherche, fiches produit (galerie, zoom, caractéristiques, avis, produits similaires), pages statiques
 - **Panier & checkout** : panier en session, coupons, estimation de livraison par zone, commande invité en une étape
-- **Comptes clients** : historique des commandes, rattachement automatique des commandes invité par email
+- **Sans compte client** : aucune inscription publique — on commande en renseignant ses coordonnées, et on suit sa livraison depuis `/suivi` avec le numéro de commande et son téléphone. La connexion est réservée à l'équipe de la boutique
 - **Paiements** : architecture multi-passerelles (PayDunya → Wave, Orange Money, cartes ; paiement à la livraison), webhooks confirmés serveur-à-serveur
 - **Administration** : dashboard (CA, ventes mensuelles, top produits, stock faible), CRUD produits/catégories/marques/coupons, gestion des commandes avec facture imprimable, clients, modération des avis, paramètres, journal d'activité
 - **Notifications** : emails en file d'attente (confirmation client, alerte admin, changements de statut)
@@ -58,7 +58,7 @@ Dans `.env` : `DB_CONNECTION=mysql` + identifiants, puis `php artisan migrate:fr
 1. `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`
 2. **Laisser `ADMIN_DEFAULT_PASSWORD` vide** : le seeder génère alors un mot de passe aléatoire affiché une seule fois. Ne jamais committer de mot de passe dans `.env.example`
 3. MySQL configuré (voir ci-dessus) — les données de démonstration ne sont pas seedées en production
-4. SMTP réel (`MAIL_*`) pour les emails de commande **et de vérification d'adresse** — sans SMTP fonctionnel, les clients ne peuvent pas vérifier leur email, et les commandes passées en invité ne leur sont jamais rattachées
+4. SMTP réel (`MAIL_*`) pour les emails de commande — confirmation au client, alerte au gérant, changements de statut. Sans SMTP fonctionnel, aucun de ces messages ne part
 5. Traitement de la file — **sans lui, aucun email ne part**. Sur serveur dédié ou en conteneur : `php artisan queue:work` supervisé (Supervisor/systemd). Sur mutualisé, où aucun processus permanent n'est possible : la tâche cron `schedule:run` (voir *Déploiement sur cPanel*)
 6. Clés PayDunya (`PAYDUNYA_*`, `PAYDUNYA_MODE=live`) — le paiement en ligne s'active automatiquement dès qu'elles sont renseignées ; déclarer l'IPN `https://votre-domaine/webhooks/paydunya`
 7. Optimisations : `php artisan config:cache route:cache view:cache event:cache` et `npm run build`
@@ -273,7 +273,7 @@ contorsions n'est nécessaire sur un VPS : voir la section Dokploy.
 ## Tests
 
 ```bash
-php artisan test   # 118 tests, 417 assertions
+php artisan test   # 106 tests, 377 assertions
 ```
 
 ## Architecture

@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ShippingZone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class PaymentTest extends TestCase
@@ -49,7 +50,7 @@ class PaymentTest extends TestCase
         ]);
     }
 
-    private function checkout(string $payment): \Illuminate\Testing\TestResponse
+    private function checkout(string $payment): TestResponse
     {
         $this->post(route('shop.cart.add', $this->product), ['quantity' => 1]);
 

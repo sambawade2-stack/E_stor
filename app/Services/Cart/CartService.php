@@ -38,9 +38,7 @@ class CartService
 
     private ?ShippingZone $zoneCache = null;
 
-    public function __construct(private readonly Session $session)
-    {
-    }
+    public function __construct(private readonly Session $session) {}
 
     /**
      * Invalide les caches après toute modification du panier.
@@ -55,7 +53,7 @@ class CartService
     }
 
     /* ----------------------------------------------------------------- */
-    /* Articles                                                           */
+    /* Articles */
     /* ----------------------------------------------------------------- */
 
     /**
@@ -159,7 +157,7 @@ class CartService
     }
 
     /* ----------------------------------------------------------------- */
-    /* Coupon                                                             */
+    /* Coupon */
     /* ----------------------------------------------------------------- */
 
     public function applyCoupon(Coupon $coupon): void
@@ -204,7 +202,7 @@ class CartService
     }
 
     /* ----------------------------------------------------------------- */
-    /* Livraison                                                          */
+    /* Livraison */
     /* ----------------------------------------------------------------- */
 
     public function setShippingZone(ShippingZone $zone): void
@@ -226,7 +224,7 @@ class CartService
     }
 
     /* ----------------------------------------------------------------- */
-    /* Totaux                                                             */
+    /* Totaux */
     /* ----------------------------------------------------------------- */
 
     public function subtotal(): float

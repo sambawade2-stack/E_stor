@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 class PaymentConfirmationService
 {
-    public function __construct(private readonly PaymentManager $payments)
-    {
-    }
+    public function __construct(private readonly PaymentManager $payments) {}
 
     public function confirm(Payment $payment): PaymentVerification
     {

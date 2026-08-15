@@ -10,8 +10,7 @@ final readonly class PaymentInitiation
     public function __construct(
         public ?string $redirectUrl,
         public ?string $checkoutToken,
-    ) {
-    }
+    ) {}
 
     /**
      * Paiement sans redirection (ex. paiement à la livraison).

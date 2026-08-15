@@ -14,9 +14,7 @@ class NewOrderAlert extends Notification implements ShouldQueue
     use BuildsOrderMail;
     use Queueable;
 
-    public function __construct(private readonly Order $order)
-    {
-    }
+    public function __construct(private readonly Order $order) {}
 
     /**
      * @return array<int, string>

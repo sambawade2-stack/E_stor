@@ -16,8 +16,7 @@ class OrderStatusUpdated extends Notification implements ShouldQueue
     public function __construct(
         private readonly Order $order,
         private readonly OrderStatus $previous,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<int, string>
@@ -32,11 +31,12 @@ class OrderStatusUpdated extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject('Commande '.$this->order->order_number.' : '.$this->order->status->label())
             ->greeting('Bonjour '.$this->order->customer_name.' !')
-            ->line($this->statusMessage());
+            ->line($this->statusMessage())
+            ->line("**Commande {$this->order->order_number}**");
 
-        if ($this->order->user_id) {
-            $mail->action('Suivre ma commande', route('account.orders.show', $this->order));
-        }
+        // Le formulaire de suivi, et non la commande : sa page exige la
+        // session du navigateur qui a commandé (cf. OrderConfirmation).
+        $mail->action('Suivre ma commande', route('shop.order.track'));
 
         return $mail
             ->line('Une question ? Répondez à cet email ou contactez-nous au '.setting('shop_phone').'.')

@@ -96,16 +96,6 @@ class Order extends Model
     /* ----------------------------------------------------------------- */
 
     /**
-     * Rattache à l'utilisateur les commandes invité passées avec son email.
-     */
-    public static function claimFor(User $user): int
-    {
-        return static::whereNull('user_id')
-            ->where('customer_email', $user->email)
-            ->update(['user_id' => $user->id]);
-    }
-
-    /**
      * Le numéro fourni correspond-il au téléphone de la commande ?
      *
      * Sert de preuve légère sur la page de suivi public : le client saisit

@@ -19,9 +19,7 @@ class GuestOrderAccess
     /** Au-delà, on oublie les plus anciennes pour ne pas gonfler la session. */
     private const MAX = 20;
 
-    public function __construct(private readonly Session $session)
-    {
-    }
+    public function __construct(private readonly Session $session) {}
 
     public function grant(Order $order): void
     {

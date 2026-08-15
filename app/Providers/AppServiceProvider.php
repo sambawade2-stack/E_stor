@@ -10,6 +10,7 @@ use App\Models\ProductImage;
 use App\Models\Review;
 use App\Services\Cart\CartService;
 use App\Services\Orders\GuestOrderAccess;
+use App\Services\Wishlist\WishlistService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -104,7 +105,7 @@ class AppServiceProvider extends ServiceProvider
         // Compteurs panier et favoris, affichés dans le header
         View::composer('partials.shop.header', function ($view) {
             $view->with('cartCount', app(CartService::class)->count());
-            $view->with('wishlistCount', app(\App\Services\Wishlist\WishlistService::class)->count());
+            $view->with('wishlistCount', app(WishlistService::class)->count());
         });
     }
 }

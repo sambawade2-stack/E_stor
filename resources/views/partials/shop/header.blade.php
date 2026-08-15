@@ -14,15 +14,14 @@
             </p>
             <div class="flex items-center gap-4">
                 <a href="tel:{{ preg_replace('/\s+/', '', setting('shop_phone')) }}" class="hover:text-white">{{ setting('shop_phone') }}</a>
+                {{-- Les clients n'ont pas de compte : le suivi de commande est
+                     proposé à tous. Seule l'équipe de la boutique, connectée,
+                     voit en plus le lien vers l'administration. --}}
+                <a href="{{ route('shop.order.track') }}" class="hover:text-white">Suivre ma commande</a>
                 @auth
                     @if (auth()->user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}" class="font-semibold text-primary-400 hover:text-primary-300">Administration</a>
                     @endif
-                    <a href="{{ route('dashboard') }}" class="hover:text-white">Mon compte</a>
-                @else
-                    {{-- Achat sans compte : on propose le suivi de commande
-                         plutôt qu'une connexion ou une inscription. --}}
-                    <a href="{{ route('shop.order.track') }}" class="hover:text-white">Suivre ma commande</a>
                 @endauth
             </div>
         </div>
@@ -60,19 +59,12 @@
 
         {{-- Actions --}}
         <div class="flex shrink-0 items-center gap-1 sm:gap-2">
-            {{-- Pour un visiteur, l'icône mène au suivi de commande : pas de
-                 compte requis pour acheter ni pour suivre sa livraison. --}}
-            @auth
-                <a href="{{ route('dashboard') }}" aria-label="Mon compte"
-                   class="grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-primary-600">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
-                </a>
-            @else
-                <a href="{{ route('shop.order.track') }}" aria-label="Suivre ma commande"
-                   class="grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-primary-600">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-6"/></svg>
-                </a>
-            @endauth
+            {{-- L'icône mène au suivi de commande : aucun compte n'est requis,
+                 ni pour acheter, ni pour suivre sa livraison. --}}
+            <a href="{{ route('shop.order.track') }}" aria-label="Suivre ma commande"
+               class="grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-primary-600">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-6"/></svg>
+            </a>
 
             <a href="{{ route('shop.wishlist') }}" aria-label="Mes favoris"
                class="relative grid h-10 w-10 place-items-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-danger-500"
@@ -153,11 +145,7 @@
             <div class="mt-2 border-t border-gray-100 pt-2">
                 <a href="{{ route('shop.contact') }}" class="block rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Contact</a>
                 <a href="{{ route('shop.about') }}" class="block rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50">À propos</a>
-                @auth
-                    <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Mon compte</a>
-                @else
-                    <a href="{{ route('shop.order.track') }}" class="block rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Suivre ma commande</a>
-                @endauth
+                <a href="{{ route('shop.order.track') }}" class="block rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Suivre ma commande</a>
             </div>
         </nav>
     </div>

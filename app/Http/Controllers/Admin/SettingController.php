@@ -11,9 +11,7 @@ use Illuminate\View\View;
 
 class SettingController extends Controller
 {
-    public function __construct(private readonly ImageService $images)
-    {
-    }
+    public function __construct(private readonly ImageService $images) {}
 
     public function edit(): View
     {

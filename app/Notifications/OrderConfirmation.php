@@ -14,9 +14,7 @@ class OrderConfirmation extends Notification implements ShouldQueue
     use BuildsOrderMail;
     use Queueable;
 
-    public function __construct(private readonly Order $order)
-    {
-    }
+    public function __construct(private readonly Order $order) {}
 
     /**
      * Canaux d'envoi. Pour activer WhatsApp plus tard : créer un canal
@@ -39,11 +37,15 @@ class OrderConfirmation extends Notification implements ShouldQueue
 
         $mail = $this->appendOrderSummary($mail, $this->order);
 
-        if ($this->order->user_id) {
-            $mail->action('Suivre ma commande', route('account.orders.show', $this->order));
-        }
+        // Vers le formulaire de suivi, et non vers la commande elle-même :
+        // sa page exige la session du navigateur qui a commandé, un lien
+        // direct ouvert depuis la boîte mail renverrait donc une erreur. Le
+        // client saisit son numéro de commande — rappelé ci-dessus — et son
+        // téléphone.
+        $mail->action('Suivre ma commande', route('shop.order.track'));
 
         return $mail
+            ->line('Munissez-vous du numéro de commande et du téléphone indiqué ci-dessous.')
             ->line('Nous vous contacterons au '.$this->order->customer_phone.' pour organiser la livraison.')
             ->salutation('À très vite, l\'équipe '.setting('shop_name'));
     }

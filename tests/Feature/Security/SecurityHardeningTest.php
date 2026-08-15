@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -58,24 +59,24 @@ class SecurityHardeningTest extends TestCase
         $this->assertStringNotContainsString('</script><script>alert', $html);
     }
 
-    public function test_registration_is_rate_limited(): void
+    /**
+     * La connexion est la porte d'entrée restante : les clients n'ayant plus
+     * de compte, c'est le seul formulaire d'authentification exposé. Il doit
+     * résister au bourrinage de mots de passe.
+     */
+    public function test_login_is_rate_limited(): void
     {
-        // Données volontairement invalides (mots de passe non concordants) :
-        // l'inscription échoue à chaque fois, l'utilisateur reste invité,
-        // ce qui permet de vérifier le throttle sans jamais déclencher la
-        // connexion automatique (qui ferait sortir des routes "guest").
-        $attempt = fn () => $this->post(route('register'), [
-            'name' => 'Test',
+        $attempt = fn () => $this->post('/login', [
             'email' => 'flood@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'not-the-same',
+            'password' => 'mauvais-mot-de-passe',
         ]);
 
         for ($i = 0; $i < 5; $i++) {
-            $attempt()->assertStatus(302)->assertSessionHasErrors('password');
+            $attempt()->assertStatus(302);
         }
 
-        $attempt()->assertStatus(429);
+        $attempt()->assertSessionHasErrors('email');
+        $this->assertGuest();
     }
 
     public function test_password_reset_request_is_rate_limited(): void
@@ -89,31 +90,37 @@ class SecurityHardeningTest extends TestCase
             ->assertStatus(429);
     }
 
-    public function test_registration_regenerates_the_session_id(): void
+    /**
+     * Fixation de session : l'identifiant doit changer à la connexion, sinon
+     * un identifiant imposé avant l'authentification resterait valable après.
+     */
+    public function test_login_regenerates_the_session_id(): void
     {
-        $this->get('/register');
-        $originalSessionId = $this->app['session']->getId();
+        $user = User::factory()->create();
 
-        $this->post(route('register'), [
-            'name' => 'Awa Ndiaye',
-            'email' => 'awa-session@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
-        ]);
+        $this->get('/login');
+        $avant = $this->app['session']->getId();
 
-        $this->assertNotSame($originalSessionId, $this->app['session']->getId());
+        $this->post('/login', ['email' => $user->email, 'password' => 'password']);
+
+        $this->assertNotSame($avant, $this->app['session']->getId());
     }
 
-    public function test_weak_passwords_are_rejected_at_registration(): void
+    /**
+     * La règle de mot de passe s'applique toujours — non plus à l'inscription,
+     * supprimée, mais à la réinitialisation, seule voie pour en définir un.
+     */
+    public function test_weak_passwords_are_rejected_when_resetting(): void
     {
-        $this->post(route('register'), [
-            'name' => 'Test',
-            'email' => 'weak@example.com',
+        $user = User::factory()->create();
+        $token = Password::createToken($user);
+
+        $this->post('/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
             'password' => 'alllowercase',
             'password_confirmation' => 'alllowercase',
         ])->assertSessionHasErrors('password');
-
-        $this->assertDatabaseMissing('users', ['email' => 'weak@example.com']);
     }
 
     public function test_admin_routes_are_protected_by_role_middleware(): void

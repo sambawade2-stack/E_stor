@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,17 +18,38 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    /**
+     * Les clients n'ayant plus de compte, la connexion ne mène plus à un
+     * espace client : un membre de la boutique arrive sur l'administration.
+     */
+    public function test_an_admin_lands_on_the_admin_panel_after_logging_in(): void
     {
-        $user = User::factory()->create();
+        $this->seed(RoleAndPermissionSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'email' => $admin->email,
             'password' => 'password',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('admin.dashboard', absolute: false));
+    }
+
+    /**
+     * Un compte sans rôle d'administration — cas qui ne devrait pas se
+     * produire — ne doit pas atterrir sur une page inexistante.
+     */
+    public function test_a_user_without_admin_role_lands_on_the_shop(): void
+    {
+        $user = User::factory()->create();
+
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('shop.home', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void

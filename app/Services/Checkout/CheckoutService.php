@@ -16,9 +16,7 @@ use RuntimeException;
 
 class CheckoutService
 {
-    public function __construct(private readonly CartService $cart)
-    {
-    }
+    public function __construct(private readonly CartService $cart) {}
 
     /**
      * Transforme le panier en commande : vérifie les stocks sous verrou,
@@ -39,7 +37,7 @@ class CheckoutService
         $coupon = $this->cart->coupon();
         $zone = $this->cart->shippingZone();
 
-        $order = DB::transaction(function () use ($items, $coupon, $zone, $customer, $user, $provider) {
+        $order = DB::transaction(function () use ($items, $coupon, $customer, $user, $provider) {
             // Verrouille les lignes produit pour éviter les surventes concurrentes
             $products = Product::whereKey($items->pluck('product.id'))
                 ->lockForUpdate()

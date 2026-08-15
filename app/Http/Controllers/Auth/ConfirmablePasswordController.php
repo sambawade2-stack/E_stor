@@ -35,6 +35,8 @@ class ConfirmablePasswordController extends Controller
 
         $request->session()->put('auth.password_confirmed_at', time());
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // L'espace client n'existe plus : on renvoie vers l'administration,
+        // seul endroit qu'un compte connecté a vocation à consulter.
+        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 }

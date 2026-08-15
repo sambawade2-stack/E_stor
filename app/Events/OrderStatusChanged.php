@@ -13,6 +13,5 @@ class OrderStatusChanged
     public function __construct(
         public readonly Order $order,
         public readonly OrderStatus $previous,
-    ) {
-    }
+    ) {}
 }

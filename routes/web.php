@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Account\DashboardController;
-use App\Http\Controllers\Account\OrderController as AccountOrderController;
 use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -82,23 +80,13 @@ Route::name('shop.')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+// Les clients n'ont pas de compte : plus d'espace client. Ils suivent leur
+// commande depuis /suivi, avec son numéro et leur téléphone. Ne subsiste que
+// le profil, pour que l'équipe de la boutique gère ses propres accès.
 Route::middleware('auth')->group(function () {
-    // Le profil reste accessible sans vérification : une adresse saisie de
-    // travers doit pouvoir être corrigée. L'exiger ici piégerait le compte —
-    // impossible de recevoir le message, impossible de changer l'adresse.
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Les commandes exposent des données personnelles (adresse, téléphone) :
-    // l'adresse email sert de preuve de propriété, elle doit donc être
-    // prouvée. Order::claimFor était déjà gardé ; ce middleware ferme
-    // l'accès en amont et coupe court à la création de comptes en masse.
-    Route::middleware('verified')->group(function () {
-        Route::get('/mon-compte', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/mon-compte/commandes', [AccountOrderController::class, 'index'])->name('account.orders');
-        Route::get('/mon-compte/commandes/{order:order_number}', [AccountOrderController::class, 'show'])->name('account.orders.show');
-    });
 });
 
 /*
