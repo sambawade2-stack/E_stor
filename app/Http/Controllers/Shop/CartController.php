@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CartController extends Controller
@@ -21,11 +19,8 @@ class CartController extends Controller
         return view('shop.cart', [
             'items' => $this->cart->items(),
             'coupon' => $this->cart->coupon(),
-            'zone' => $this->cart->shippingZone(),
-            'zones' => ShippingZone::active()->ordered()->get(),
             'subtotal' => $this->cart->subtotal(),
             'discount' => $this->cart->discount(),
-            'shippingCost' => $this->cart->shippingCost(),
             'total' => $this->cart->total(),
         ]);
     }
@@ -98,20 +93,5 @@ class CartController extends Controller
         $this->cart->removeCoupon();
 
         return back()->with('success', 'Code promo retiré.');
-    }
-
-    public function setShippingZone(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'shipping_zone_id' => [
-                'required',
-                'integer',
-                Rule::exists('shipping_zones', 'id')->where('is_active', true),
-            ],
-        ]);
-
-        $this->cart->setShippingZone(ShippingZone::active()->findOrFail($validated['shipping_zone_id']));
-
-        return back();
     }
 }

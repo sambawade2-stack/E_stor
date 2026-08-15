@@ -98,20 +98,10 @@
                         @enderror
                     @endif
 
-                    {{-- Estimation livraison --}}
-                    <form action="{{ route('shop.cart.shipping') }}" method="POST">
-                        @csrf
-                        <label for="shipping_zone_id" class="mb-1.5 block text-sm font-medium text-gray-700">Zone de livraison</label>
-                        <select id="shipping_zone_id" name="shipping_zone_id" x-data @change="$el.form.submit()"
-                                class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                            <option value="" disabled @selected(! $zone)>Choisir ma zone…</option>
-                            @foreach ($zones as $z)
-                                <option value="{{ $z->id }}" @selected($zone?->id === $z->id)>
-                                    {{ $z->name }} ({{ $z->delivery_delay }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
+                    {{-- Plus de choix de zone ici : il ne servait qu'à estimer
+                         un tarif, et la livraison se convient désormais après la
+                         commande. La zone reste demandée au moment de commander,
+                         pour savoir où livrer. --}}
 
                     {{-- Totaux --}}
                     <dl class="space-y-2.5 border-t border-gray-200 pt-4 text-sm">

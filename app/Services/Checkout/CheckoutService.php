@@ -35,7 +35,6 @@ class CheckoutService
         }
 
         $coupon = $this->cart->coupon();
-        $zone = $this->cart->shippingZone();
 
         $order = DB::transaction(function () use ($items, $coupon, $customer, $user, $provider) {
             // Verrouille les lignes produit pour éviter les surventes concurrentes

@@ -49,7 +49,6 @@ Route::name('shop.')->group(function () {
         Route::post('/panier/ajouter/{product:slug}', [CartController::class, 'add'])->name('cart.add');
         Route::patch('/panier/{product:slug}', [CartController::class, 'update'])->name('cart.update');
         Route::delete('/panier/{product:slug}', [CartController::class, 'remove'])->name('cart.remove');
-        Route::post('/panier/livraison', [CartController::class, 'setShippingZone'])->name('cart.shipping');
     });
     Route::get('/panier', [CartController::class, 'index'])->name('cart');
     Route::post('/panier/coupon', [CartController::class, 'applyCoupon'])->middleware('throttle:15,1')->name('cart.coupon');

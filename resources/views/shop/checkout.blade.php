@@ -8,7 +8,7 @@
     </div>
 
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
-         x-data="{ zone: '{{ old('shipping_zone_id', $zone?->id) }}',
+         x-data="{ zone: '{{ old('shipping_zone_id') }}',
                    subtotal: {{ $subtotal }},
                    discount: {{ $discount }},
                    get total() { return this.subtotal - this.discount },

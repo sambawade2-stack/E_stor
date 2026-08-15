@@ -34,7 +34,6 @@ class CheckoutController extends Controller
         return view('shop.checkout', [
             'items' => $this->cart->items(),
             'coupon' => $this->cart->coupon(),
-            'zone' => $this->cart->shippingZone(),
             'zones' => ShippingZone::active()->ordered()->get(),
             'subtotal' => $this->cart->subtotal(),
             'discount' => $this->cart->discount(),
@@ -56,8 +55,9 @@ class CheckoutController extends Controller
             return back()->withErrors(['payment' => 'Ce moyen de paiement n\'est pas disponible.'])->withInput();
         }
 
+        // La zone ne sert plus qu'à savoir où livrer : elle est reprise
+        // telle quelle dans la commande, sans être mémorisée en session.
         $zone = ShippingZone::active()->findOrFail($validated['shipping_zone_id']);
-        $this->cart->setShippingZone($zone);
 
         try {
             $order = $checkout->placeOrder(

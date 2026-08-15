@@ -4,7 +4,6 @@ namespace App\Services\Cart;
 
 use App\Models\Coupon;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Collection;
 
@@ -18,10 +17,8 @@ class CartService
 
     private const COUPON_KEY = 'cart.coupon';
 
-    private const SHIPPING_KEY = 'cart.shipping_zone';
-
     /**
-     * Caches par requête. items(), coupon() et shippingZone() s'appellent en
+     * Caches par requête. items(), coupon(), subtotal() et total() s'appellent en
      * cascade (total → subtotal → items, discount → coupon → subtotal → items…) :
      * sans mémoïsation, l'affichage du panier rejouait une dizaine de fois
      * les mêmes SELECT.
@@ -36,8 +33,6 @@ class CartService
 
     private bool $zoneResolved = false;
 
-    private ?ShippingZone $zoneCache = null;
-
     public function __construct(private readonly Session $session) {}
 
     /**
@@ -49,7 +44,6 @@ class CartService
         $this->couponResolved = false;
         $this->couponCache = null;
         $this->zoneResolved = false;
-        $this->zoneCache = null;
     }
 
     /* ----------------------------------------------------------------- */
@@ -137,7 +131,9 @@ class CartService
 
     public function clear(): void
     {
-        $this->session->forget([self::ITEMS_KEY, self::COUPON_KEY, self::SHIPPING_KEY]);
+        // 'cart.shipping_zone' est purgée en plus : elle peut traîner dans
+        // une session ouverte avant le retrait du choix de zone au panier.
+        $this->session->forget([self::ITEMS_KEY, self::COUPON_KEY, 'cart.shipping_zone']);
         $this->flushCache();
     }
 
@@ -204,24 +200,6 @@ class CartService
     /* ----------------------------------------------------------------- */
     /* Livraison */
     /* ----------------------------------------------------------------- */
-
-    public function setShippingZone(ShippingZone $zone): void
-    {
-        $this->session->put(self::SHIPPING_KEY, $zone->id);
-        $this->flushCache();
-    }
-
-    public function shippingZone(): ?ShippingZone
-    {
-        if ($this->zoneResolved) {
-            return $this->zoneCache;
-        }
-
-        $id = $this->session->get(self::SHIPPING_KEY);
-        $this->zoneResolved = true;
-
-        return $this->zoneCache = $id ? ShippingZone::active()->find($id) : null;
-    }
 
     /* ----------------------------------------------------------------- */
     /* Totaux */

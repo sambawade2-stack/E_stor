@@ -249,14 +249,6 @@ class CartCheckoutTest extends TestCase
         $this->assertSame(0, Order::count());
     }
 
-    public function test_an_inactive_shipping_zone_is_rejected_from_the_cart(): void
-    {
-        $inactive = ShippingZone::create(['name' => 'Ziguinchor', 'cost' => 15000, 'is_active' => false]);
-
-        $this->post(route('shop.cart.shipping'), ['shipping_zone_id' => $inactive->id])
-            ->assertSessionHasErrors('shipping_zone_id');
-    }
-
     /**
      * Un produit tombé en rupture après son ajout doit sortir du panier :
      * le garder bloquait toute commande, CheckoutService refusant la ligne
@@ -358,7 +350,6 @@ class CartCheckoutTest extends TestCase
 
         $this->post(route('shop.cart.add', $this->product), ['quantity' => 2]);
         $this->post(route('shop.cart.coupon'), ['code' => 'PROMO1']);
-        $this->post(route('shop.cart.shipping'), ['shipping_zone_id' => $this->zone->id]);
 
         DB::connection()->enableQueryLog();
         DB::connection()->flushQueryLog();
