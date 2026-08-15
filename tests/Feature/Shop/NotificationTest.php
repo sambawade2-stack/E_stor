@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\ShippingZone;
 use App\Notifications\NewOrderAlert;
 use App\Notifications\OrderConfirmation;
 use App\Notifications\OrderStatusUpdated;
@@ -23,8 +22,6 @@ class NotificationTest extends TestCase
     use RefreshDatabase;
 
     private Product $product;
-
-    private ShippingZone $zone;
 
     protected function setUp(): void
     {
@@ -43,7 +40,6 @@ class NotificationTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->zone = ShippingZone::create(['name' => 'Dakar', 'cost' => 2000]);
     }
 
     private function checkout(?string $email = 'awa@example.com'): void
@@ -55,7 +51,7 @@ class NotificationTest extends TestCase
             'customer_phone' => '+221 77 123 45 67',
             'customer_email' => $email,
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
     }

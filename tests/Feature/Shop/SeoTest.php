@@ -4,7 +4,6 @@ namespace Tests\Feature\Shop;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,7 +29,6 @@ class SeoTest extends TestCase
             'is_active' => true,
         ]);
 
-        ShippingZone::create(['name' => 'Dakar', 'cost' => 2000]);
     }
 
     /**

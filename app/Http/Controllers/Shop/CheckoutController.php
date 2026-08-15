@@ -7,7 +7,6 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Order;
-use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use App\Services\Checkout\CheckoutService;
 use App\Services\Orders\GuestOrderAccess;
@@ -34,7 +33,6 @@ class CheckoutController extends Controller
         return view('shop.checkout', [
             'items' => $this->cart->items(),
             'coupon' => $this->cart->coupon(),
-            'zones' => ShippingZone::active()->ordered()->get(),
             'subtotal' => $this->cart->subtotal(),
             'discount' => $this->cart->discount(),
             'paymentMethods' => $this->payments->available(),
@@ -55,10 +53,6 @@ class CheckoutController extends Controller
             return back()->withErrors(['payment' => 'Ce moyen de paiement n\'est pas disponible.'])->withInput();
         }
 
-        // La zone ne sert plus qu'à savoir où livrer : elle est reprise
-        // telle quelle dans la commande, sans être mémorisée en session.
-        $zone = ShippingZone::active()->findOrFail($validated['shipping_zone_id']);
-
         try {
             $order = $checkout->placeOrder(
                 customer: [
@@ -66,7 +60,7 @@ class CheckoutController extends Controller
                     'customer_email' => $validated['customer_email'] ?? null,
                     'customer_phone' => $validated['customer_phone'],
                     'address' => $validated['address'],
-                    'city' => $zone->name,
+                    'city' => $validated['city'],
                     'notes' => $validated['notes'] ?? null,
                 ],
                 user: $request->user(),

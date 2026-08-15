@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use App\Services\Cart\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -20,8 +19,6 @@ class CartCheckoutTest extends TestCase
     use RefreshDatabase;
 
     private Product $product;
-
-    private ShippingZone $zone;
 
     protected function setUp(): void
     {
@@ -38,11 +35,6 @@ class CartCheckoutTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->zone = ShippingZone::create([
-            'name' => 'Dakar',
-            'cost' => 2000,
-            'delivery_delay' => '24h',
-        ]);
     }
 
     public function test_a_product_can_be_added_to_the_cart(): void
@@ -102,7 +94,7 @@ class CartCheckoutTest extends TestCase
             'customer_phone' => '+221 77 123 45 67',
             'customer_email' => 'awa@example.com',
             'address' => 'Sacré-Cœur 3, villa 123',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 
@@ -142,7 +134,7 @@ class CartCheckoutTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 
@@ -152,12 +144,40 @@ class CartCheckoutTest extends TestCase
         $this->assertSame(0, $this->product->fresh()->stock_quantity);
     }
 
+    /**
+     * La ville est saisie librement depuis le retrait des zones de livraison.
+     * Elle doit être reprise telle quelle sur la commande : elle figure sur la
+     * facture, dans les emails et la liste des commandes — sans elle, on ne
+     * sait plus où livrer.
+     */
+    public function test_the_city_is_typed_freely_and_kept_on_the_order(): void
+    {
+        $this->post(route('shop.cart.add', $this->product));
+
+        $this->post(route('shop.checkout.store'), [
+            'customer_name' => 'Awa Ndiaye',
+            'customer_phone' => '+221 77 123 45 67',
+            'address' => 'Rue 12, près du marché',
+            'city' => 'Saint-Louis',
+            'payment' => 'cash_on_delivery',
+        ]);
+
+        $order = Order::firstOrFail();
+
+        $this->assertSame('Saint-Louis', $order->city);
+
+        // Et elle s'affiche bien au client
+        $this->get(route('shop.order.confirmation', $order))
+            ->assertOk()
+            ->assertSee('Saint-Louis');
+    }
+
     public function test_checkout_validates_required_fields(): void
     {
         $this->post(route('shop.cart.add', $this->product));
 
         $this->post(route('shop.checkout.store'), [])
-            ->assertSessionHasErrors(['customer_name', 'customer_phone', 'address', 'shipping_zone_id', 'payment']);
+            ->assertSessionHasErrors(['customer_name', 'customer_phone', 'address', 'city', 'payment']);
     }
 
     /**
@@ -179,7 +199,7 @@ class CartCheckoutTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 
@@ -212,7 +232,7 @@ class CartCheckoutTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 
@@ -221,32 +241,6 @@ class CartCheckoutTest extends TestCase
             Cache::has('home.sections'),
             'Le cache de l\'accueil doit être purgé pour refléter le nouveau stock.'
         );
-    }
-
-    /**
-     * Une zone désactivée n'est pas livrable. Sans filtre sur is_active, la
-     * validation la laissait passer puis CartService::shippingZone() la
-     * rejetait : la commande partait avec 0 F de frais de port.
-     */
-    public function test_an_inactive_shipping_zone_is_rejected_at_checkout(): void
-    {
-        $inactive = ShippingZone::create([
-            'name' => 'Ziguinchor',
-            'cost' => 15000,
-            'is_active' => false,
-        ]);
-
-        $this->post(route('shop.cart.add', $this->product));
-
-        $this->post(route('shop.checkout.store'), [
-            'customer_name' => 'Awa Ndiaye',
-            'customer_phone' => '+221 77 123 45 67',
-            'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $inactive->id,
-            'payment' => 'cash_on_delivery',
-        ])->assertSessionHasErrors('shipping_zone_id');
-
-        $this->assertSame(0, Order::count());
     }
 
     /**
@@ -288,7 +282,7 @@ class CartCheckoutTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 
@@ -323,7 +317,7 @@ class CartCheckoutTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 

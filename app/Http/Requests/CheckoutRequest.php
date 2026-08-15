@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Enums\PaymentProvider;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class CheckoutRequest extends FormRequest
@@ -24,14 +23,10 @@ class CheckoutRequest extends FormRequest
             'customer_phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9 ]{7,20}$/'],
             'customer_email' => ['nullable', 'email', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            // Une zone désactivée n'est pas livrable : sans le filtre
-            // is_active, CartService::shippingZone() la rejetterait plus tard
-            // et la commande partirait avec 0 F de frais de port.
-            'shipping_zone_id' => [
-                'required',
-                'integer',
-                Rule::exists('shipping_zones', 'id')->where('is_active', true),
-            ],
+            // Saisie libre depuis le retrait des zones de livraison : le
+            // client indique sa ville, elle est reprise telle quelle sur la
+            // commande, la facture et les emails.
+            'city' => ['required', 'string', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'payment' => ['required', new Enum(PaymentProvider::class)],
         ];
@@ -47,7 +42,7 @@ class CheckoutRequest extends FormRequest
             'customer_phone' => 'téléphone',
             'customer_email' => 'email',
             'address' => 'adresse',
-            'shipping_zone_id' => 'zone de livraison',
+            'city' => 'ville',
             'notes' => 'notes',
         ];
     }

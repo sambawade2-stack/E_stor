@@ -5,7 +5,6 @@ namespace Tests\Feature\Shop;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use App\Models\User;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,8 +15,6 @@ class OrderItemImageTest extends TestCase
     use RefreshDatabase;
 
     private Product $product;
-
-    private ShippingZone $zone;
 
     protected function setUp(): void
     {
@@ -36,7 +33,6 @@ class OrderItemImageTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->zone = ShippingZone::create(['name' => 'Dakar', 'cost' => 2000]);
     }
 
     private function placeOrder(): Order
@@ -47,7 +43,7 @@ class OrderItemImageTest extends TestCase
             'customer_name' => 'Awa Ndiaye',
             'customer_phone' => '+221 77 123 45 67',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => 'cash_on_delivery',
         ]);
 

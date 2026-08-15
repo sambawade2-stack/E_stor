@@ -8,8 +8,7 @@
     </div>
 
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
-         x-data="{ zone: '{{ old('shipping_zone_id') }}',
-                   subtotal: {{ $subtotal }},
+         x-data="{ subtotal: {{ $subtotal }},
                    discount: {{ $discount }},
                    get total() { return this.subtotal - this.discount },
                    fmt(n) { return new Intl.NumberFormat('fr-FR').format(n) + ' {{ setting('currency_symbol') }}' } }">
@@ -57,16 +56,17 @@
                 <section class="rounded-2xl border border-gray-100 p-6">
                     <h2 class="mb-5 text-lg font-bold">Livraison</h2>
                     <div class="grid gap-5">
+                        {{-- Champ libre plutôt qu'une liste de zones : celle-ci
+                             ne servait qu'à appliquer un tarif, désormais convenu
+                             après la commande. La ville reste demandée — elle
+                             figure sur la facture, les emails et la liste des
+                             commandes, et il faut bien savoir où livrer. --}}
                         <div>
-                            <label for="shipping_zone_id" class="mb-1.5 block text-sm font-medium text-gray-700">Ville / Zone de livraison *</label>
-                            <select id="shipping_zone_id" name="shipping_zone_id" required x-model="zone"
-                                    class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
-                                <option value="" disabled>Choisir…</option>
-                                @foreach ($zones as $z)
-                                    <option value="{{ $z->id }}">{{ $z->name }} ({{ $z->delivery_delay }})</option>
-                                @endforeach
-                            </select>
-                            @error('shipping_zone_id')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                            <label for="city" class="mb-1.5 block text-sm font-medium text-gray-700">Ville *</label>
+                            <input type="text" id="city" name="city" required placeholder="Dakar, Thiès, Saint-Louis…"
+                                   value="{{ old('city') }}"
+                                   class="w-full rounded-xl border-gray-200 text-sm focus:border-primary-500 focus:ring-primary-500">
+                            @error('city')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                         </div>
                         <div>
                             <label for="address" class="mb-1.5 block text-sm font-medium text-gray-700">Adresse complète *</label>

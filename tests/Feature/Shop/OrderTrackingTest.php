@@ -6,7 +6,6 @@ use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -145,16 +144,15 @@ class OrderTrackingTest extends TestCase
             'stock_quantity' => 10,
             'is_active' => true,
         ]);
-        $zone = ShippingZone::create(['name' => 'Dakar', 'cost' => 2000]);
 
-        $place = function () use ($product, $zone) {
+        $place = function () use ($product) {
             $this->post(route('shop.cart.add', $product), ['quantity' => 1]);
 
             $this->post(route('shop.checkout.store'), [
                 'customer_name' => 'Awa Ndiaye',
                 'customer_phone' => '+221 77 123 45 67',
                 'address' => 'Sacré-Cœur 3',
-                'shipping_zone_id' => $zone->id,
+                'city' => 'Dakar',
                 'payment' => 'cash_on_delivery',
             ]);
         };

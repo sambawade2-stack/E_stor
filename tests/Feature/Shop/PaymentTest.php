@@ -9,7 +9,6 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Product;
-use App\Models\ShippingZone;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
@@ -20,8 +19,6 @@ class PaymentTest extends TestCase
     use RefreshDatabase;
 
     private Product $product;
-
-    private ShippingZone $zone;
 
     protected function setUp(): void
     {
@@ -38,7 +35,6 @@ class PaymentTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->zone = ShippingZone::create(['name' => 'Dakar', 'cost' => 2000]);
     }
 
     private function configurePayDunya(): void
@@ -59,7 +55,7 @@ class PaymentTest extends TestCase
             'customer_phone' => '+221 77 123 45 67',
             'customer_email' => 'awa@example.com',
             'address' => 'Sacré-Cœur 3',
-            'shipping_zone_id' => $this->zone->id,
+            'city' => 'Dakar',
             'payment' => $payment,
         ]);
     }
