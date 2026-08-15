@@ -7,10 +7,12 @@ use App\Enums\PaymentProvider;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\ShippingZone;
 use App\Notifications\NewOrderAlert;
 use App\Notifications\OrderConfirmation;
 use App\Notifications\OrderStatusUpdated;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
@@ -83,6 +85,23 @@ class NotificationTest extends TestCase
         Notification::assertSentTimes(NewOrderAlert::class, 1);
     }
 
+    /**
+     * Une variable d'environnement présente mais VIDE écrase la valeur par
+     * défaut d'env() par une chaîne vide. Avec SHOP_ADMIN_EMAIL= vide et
+     * aucun email renseigné dans les réglages, l'alerte de nouvelle commande
+     * était abandonnée sans le moindre message : le gérant ignorait ses
+     * commandes. Le repli doit tenir même dans cette configuration.
+     */
+    public function test_the_admin_alert_survives_an_empty_admin_email_setting(): void
+    {
+        config(['shop.admin_email' => 'repli@example.com']);
+        Setting::set('shop_email', '');
+
+        $this->checkout(email: 'awa@example.com');
+
+        Notification::assertSentTimes(NewOrderAlert::class, 1);
+    }
+
     public function test_a_status_change_notifies_the_customer(): void
     {
         $this->checkout();
@@ -113,15 +132,15 @@ class NotificationTest extends TestCase
         ]);
 
         $this->assertContains(
-            \Illuminate\Contracts\Queue\ShouldQueue::class,
+            ShouldQueue::class,
             class_implements(new OrderConfirmation($order))
         );
         $this->assertContains(
-            \Illuminate\Contracts\Queue\ShouldQueue::class,
+            ShouldQueue::class,
             class_implements(new NewOrderAlert($order))
         );
         $this->assertContains(
-            \Illuminate\Contracts\Queue\ShouldQueue::class,
+            ShouldQueue::class,
             class_implements(new OrderStatusUpdated($order, OrderStatus::Pending))
         );
     }

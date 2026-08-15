@@ -5,12 +5,12 @@ namespace App\Models;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentProvider;
 use App\Enums\PaymentStatus;
+use App\Events\OrderStatusChanged;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -68,7 +68,7 @@ class Order extends Model
     }
 
     /* ----------------------------------------------------------------- */
-    /* Relations                                                          */
+    /* Relations */
     /* ----------------------------------------------------------------- */
 
     public function user(): BelongsTo
@@ -92,7 +92,7 @@ class Order extends Model
     }
 
     /* ----------------------------------------------------------------- */
-    /* Helpers                                                            */
+    /* Helpers */
     /* ----------------------------------------------------------------- */
 
     /**
@@ -133,12 +133,30 @@ class Order extends Model
     }
 
     /**
-     * Génère un numéro de commande unique, ex. ES-20260731-A1B2C3.
+     * Génère un numéro de commande unique, ex. ES-20260731-A1B2C3D4.
+     *
+     * Le suffixe est tiré d'un alphabet explicite plutôt que d'un
+     * strtoupper(Str::random()) : ce repli faisait tomber « a » et « A » sur
+     * le même caractère, si bien que la distribution n'était pas uniforme et
+     * l'entropie réelle inférieure à son apparence. Huit caractères sur 32
+     * symboles — sans I, O, 0 ni 1, sources d'erreur à la lecture au
+     * téléphone — donnent 40 bits.
+     *
+     * Ce numéro n'est jamais un secret à lui seul : la page de suivi exige
+     * en plus le téléphone, et la confirmation une session valide. Il doit
+     * simplement rester non énumérable.
      */
     public static function generateOrderNumber(): string
     {
+        $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
         do {
-            $number = 'ES-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+            $suffixe = '';
+            for ($i = 0; $i < 8; $i++) {
+                $suffixe .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+            }
+
+            $number = 'ES-'.now()->format('Ymd').'-'.$suffixe;
         } while (static::where('order_number', $number)->exists());
 
         return $number;
@@ -193,7 +211,7 @@ class Order extends Model
             $this->update($changes);
         });
 
-        \App\Events\OrderStatusChanged::dispatch($this, $previous);
+        OrderStatusChanged::dispatch($this, $previous);
     }
 
     public function markAsPaid(): void

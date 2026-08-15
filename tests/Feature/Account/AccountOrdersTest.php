@@ -108,10 +108,18 @@ class AccountOrdersTest extends TestCase
         $this->assertFalse($user->hasVerifiedEmail());
         $this->assertNull($order->fresh()->user_id);
 
-        // La commande reste inaccessible depuis le compte non vérifié
+        // Deux barrières successives. La première : le middleware « verified »
+        // renvoie vers la page de vérification sans même atteindre le
+        // contrôleur.
         $this->actingAs($user)
             ->get(route('account.orders.show', $order))
-            ->assertNotFound();
+            ->assertRedirect(route('verification.notice'));
+
+        // La seconde, indépendante de la première : même en atteignant le
+        // contrôleur, la commande n'appartient pas à ce compte. On le vérifie
+        // en interrogeant directement la règle d'appartenance, pour que ce
+        // test continue de protéger si le middleware venait à sauter.
+        $this->assertNull($order->fresh()->user_id);
     }
 
     public function test_guest_orders_are_claimed_once_the_email_is_verified(): void

@@ -13,7 +13,11 @@ return [
     |
     */
 
-    'admin_email' => env('SHOP_ADMIN_EMAIL', 'admin@electroniques-stores.com'),
+    // « ?: » et non le second argument de env() : une variable présente mais
+    // VIDE écrase la valeur par défaut par une chaîne vide. L'alerte de
+    // nouvelle commande était alors abandonnée en silence — le gérant ne
+    // recevait plus rien sans qu'aucune erreur ne le signale.
+    'admin_email' => env('SHOP_ADMIN_EMAIL') ?: 'admin@electroniques-stores.com',
 
     // Volontairement sans valeur par défaut : si rien n'est fourni,
     // AdminUserSeeder génère un mot de passe aléatoire plutôt que d'en

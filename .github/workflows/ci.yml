@@ -1,0 +1,104 @@
+name: Tests et sécurité
+
+# La CVE de league/commonmark est restée invisible jusqu'à un audit manuel.
+# Ce contrôle la signalerait désormais dès sa publication.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Une vulnérabilité peut être publiée sans qu'une ligne de code ne bouge :
+    # le contrôle hebdomadaire l'attrape même sans activité sur le dépôt.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Suite de tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          # Même version que l'hébergement de production.
+          php-version: '8.3'
+          extensions: gd, pdo_sqlite, mbstring, zip, exif, intl, bcmath
+          coverage: none
+
+      - name: Cache des dépendances
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Installer les dépendances
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Préparer l'environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Tests
+        run: php artisan test
+
+      # Indicatif seulement : le style n'est pas un enjeu de sécurité, et une
+      # base historiquement non formatée bloquerait chaque fusion sans raison.
+      - name: Style de code (indicatif)
+        run: ./vendor/bin/pint --test
+        continue-on-error: true
+
+  securite:
+    name: Vulnérabilités des dépendances
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Installer les dépendances
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      # Échoue si une dépendance PHP porte un avis de sécurité connu.
+      - name: Audit Composer
+        run: composer audit
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Installer les paquets JS
+        run: npm ci
+
+      # --omit=dev : seules les dépendances livrées au navigateur comptent ;
+      # une faille dans un outil de build n'expose pas les visiteurs.
+      - name: Audit npm
+        run: npm audit --omit=dev --audit-level=moderate
+
+  secrets:
+    name: Recherche de secrets
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Historique complet : un secret retiré du dernier commit peut
+          # subsister dans les précédents — le cas s'est déjà produit ici.
+          fetch-depth: 0
+
+      - name: Analyse de l'historique
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

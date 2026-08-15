@@ -14,7 +14,6 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Shop\CartController;
-use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Shop\CatalogController;
 use App\Http\Controllers\Shop\CheckoutController;
 use App\Http\Controllers\Shop\HomeController;
@@ -23,6 +22,7 @@ use App\Http\Controllers\Shop\PageController;
 use App\Http\Controllers\Shop\PaymentController;
 use App\Http\Controllers\Shop\ProductController;
 use App\Http\Controllers\Shop\WishlistController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Webhooks\PayDunyaWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,13 +83,22 @@ Route::name('shop.')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
-    Route::get('/mon-compte', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/mon-compte/commandes', [AccountOrderController::class, 'index'])->name('account.orders');
-    Route::get('/mon-compte/commandes/{order:order_number}', [AccountOrderController::class, 'show'])->name('account.orders.show');
-
+    // Le profil reste accessible sans vérification : une adresse saisie de
+    // travers doit pouvoir être corrigée. L'exiger ici piégerait le compte —
+    // impossible de recevoir le message, impossible de changer l'adresse.
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Les commandes exposent des données personnelles (adresse, téléphone) :
+    // l'adresse email sert de preuve de propriété, elle doit donc être
+    // prouvée. Order::claimFor était déjà gardé ; ce middleware ferme
+    // l'accès en amont et coupe court à la création de comptes en masse.
+    Route::middleware('verified')->group(function () {
+        Route::get('/mon-compte', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/mon-compte/commandes', [AccountOrderController::class, 'index'])->name('account.orders');
+        Route::get('/mon-compte/commandes/{order:order_number}', [AccountOrderController::class, 'show'])->name('account.orders.show');
+    });
 });
 
 /*

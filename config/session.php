@@ -47,7 +47,10 @@ return [
     |
     */
 
-    'encrypt' => env('SESSION_ENCRYPT', false),
+    // Activé par défaut : la session est stockée en base et contient le
+    // panier ainsi que les numéros de commande consultables par un invité.
+    // Un accès en lecture à la table les révélerait en clair.
+    'encrypt' => env('SESSION_ENCRYPT', true),
 
     /*
     |--------------------------------------------------------------------------
